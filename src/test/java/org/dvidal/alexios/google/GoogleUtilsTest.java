@@ -19,26 +19,39 @@ package org.dvidal.alexios.google;
 
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.services.sheets.v4.Sheets;
+import com.google.api.services.sheets.v4.model.Sheet;
+import com.google.api.services.sheets.v4.model.SheetProperties;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-class GoogleConstantsTest {
+class GoogleUtilsTest {
+    static final String SHEET_ID = "1f4IlMSLRutavYJeyEx0G4jy2OdnSNLt8iQ8rl6HcBXg";
+
     //Sample file: 1f4IlMSLRutavYJeyEx0G4jy2OdnSNLt8iQ8rl6HcBXg
     @Test
     void credentialAndReadTest() throws Exception {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
-        final var sheetID = "1f4IlMSLRutavYJeyEx0G4jy2OdnSNLt8iQ8rl6HcBXg";
         final var range = "070000!B5";
-        var service = new Sheets.Builder(transport, GoogleConstants.JSON_FACTORY, GoogleConstants.getCredentials(transport))
-                .setApplicationName(GoogleConstants.APP_NAME)
+        var service = new Sheets.Builder(transport, GoogleUtils.JSON_FACTORY, GoogleUtils.getCredentials(transport))
+                .setApplicationName(GoogleUtils.APP_NAME)
                 .build();
         var response = service.spreadsheets().values()
-                .get(sheetID, range)
+                .get(SHEET_ID, range)
                 .execute();
 
         var values = response.getValues();
         Assertions.assertNotNull(values);
         Assertions.assertFalse(values.isEmpty());
         values.forEach(l -> l.forEach(System.out::println));
+    }
+
+    @Test
+    void spreadSheetTest() throws Exception {
+        var sheet = GoogleUtils.getSheet(SHEET_ID);
+        sheet.getSheets()
+                .stream()
+                .map(Sheet::getProperties)
+                .map(SheetProperties::getTitle)
+                .forEach(System.out::println);
     }
 }

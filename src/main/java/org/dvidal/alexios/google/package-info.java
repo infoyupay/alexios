@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 David Vidal Escudero - Free Open Source Software Consultancy
+ * Copyright (C) 2021 David Vidal Escudero - Free Open Source Software Consultancy
  *
  *       This program is free software: you can redistribute it and/or modify
  *       it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * This is the main package of Alexios APP.
+ * This package supports interops with Google Sheets API.
  *
  * @version 1.0
  */
-package org.dvidal.alexios;
+package org.dvidal.alexios.google;

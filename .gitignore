@@ -9,3 +9,5 @@
 /.gradle/
 /build/
 /tokens/
+/out/
+/testout/

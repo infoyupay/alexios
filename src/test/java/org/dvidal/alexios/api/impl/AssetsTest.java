@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 David Vidal Escudero - Free Open Source Software Consultancy
+ * Copyright (C) 2021 David Vidal Escudero - Free Open Source Software Consultancy
  *
  *       This program is free software: you can redistribute it and/or modify
  *       it under the terms of the GNU General Public License as published by
@@ -14,9 +14,22 @@
  *       You should have received a copy of the GNU General Public License
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-/**
- * This is the main package of Alexios APP.
- *
- * @version 1.0
- */
-package org.dvidal.alexios;
+
+package org.dvidal.alexios.api.impl;
+
+import org.dvidal.alexios.google.GoogleUtils;
+import org.junit.jupiter.api.Test;
+
+import java.io.File;
+
+class AssetsTest {
+    static final String assetID = "1f4IlMSLRutavYJeyEx0G4jy2OdnSNLt8iQ8rl6HcBXg";
+
+    @Test
+    void testAssets() throws Exception {
+        var sheet = GoogleUtils.getSheet(assetID);
+        var output = new File("testout", "LE070000");
+        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
+        new AssetsProcessor().processSheet(sheet, output);
+    }
+}

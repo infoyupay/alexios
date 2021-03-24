@@ -1,3 +1,6 @@
+/**
+ * This is the main explicit module of Alexios.
+ */
 module alexios.main {
     requires google.api.services.sheets.v4.rev612;
     requires google.api.client;
