@@ -29,16 +29,14 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
-import com.google.api.services.sheets.v4.model.CellData;
-import com.google.api.services.sheets.v4.model.Spreadsheet;
+import com.google.api.services.sheets.v4.model.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -161,4 +159,115 @@ public class GoogleUtils {
         };
     }
 
+    /**
+     * Utility method to solve a code pattern in which I have to
+     * read doubles from sucessive columns and put them into
+     * some array items, in such a way that the cell data column
+     * index is one behind array item index. Ie:
+     * <pre>
+     * {@code
+     * line[10] = "%.2f".formatted(doubleFromCell(row.get(9)));
+     * line[11] = "%.2f".formatted(doubleFromCell(row.get(10)));
+     * line[12] = "%.2f".formatted(doubleFromCell(row.get(11)));
+     * line[13] = "%.2f".formatted(doubleFromCell(row.get(12)));
+     * line[14] = "%.2f".formatted(doubleFromCell(row.get(13)));
+     * }
+     * </pre>
+     * This code pattern is repeated in many book processors.
+     *
+     * @param target the target array of strings where read data should be put.
+     * @param from   the begining (inclusive) index at which put data.
+     * @param until  the end (inclusive) index at which put data.
+     * @param row    the google sheet row represented as a List of CellData.
+     */
+    public static void readDoubleBehind(String[] target, int from, int until, List<CellData> row) {
+        for (var i = from; i <= until; i++) {
+            target[i] = "%.2f".formatted(doubleFromCell(row.get(i - 1)));
+        }
+    }
+
+    /**
+     * Utility method to solve a code pattern in which I have to
+     * read doubles from sucessive columns and put them into
+     * some array items, in such a way that the cell data column
+     * index is one ahead array item index. Ie:
+     * <pre>
+     * {@code
+     * line[10] = "%.2f".formatted(doubleFromCell(row.get(11)));
+     * line[11] = "%.2f".formatted(doubleFromCell(row.get(12)));
+     * line[12] = "%.2f".formatted(doubleFromCell(row.get(13)));
+     * line[13] = "%.2f".formatted(doubleFromCell(row.get(14)));
+     * line[14] = "%.2f".formatted(doubleFromCell(row.get(15)));
+     * }
+     * </pre>
+     * This code pattern is repeated in many book processors.
+     *
+     * @param target the target array of strings where read data should be put.
+     * @param from   the begining (inclusive) index at which put data.
+     * @param until  the end (inclusive) index at which put data.
+     * @param row    the google sheet row represented as a List of CellData.
+     */
+    public static void readDoubleAhead(String[] target, int from, int until, List<CellData> row) {
+        for (var i = from; i <= until; i++) {
+            target[i] = "%.2f".formatted(doubleFromCell(row.get(i + 1)));
+        }
+    }
+
+    /**
+     * Utility method to write the data from a worksheet and mapped
+     * to PLE tuples, into a plain txt file.
+     *
+     * @param worksheet  the worksheet.
+     * @param skipHeader the header rows count to skip.
+     * @param fileName   the file name where to write.
+     * @param path       the output directory path (parent of target file).
+     * @param converter  The converter to extract PLE tuples from a worksheet.
+     * @throws IOException if output fails.
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    public static void exportFile(Sheet worksheet,
+                                  long skipHeader,
+                                  String fileName,
+                                  File path,
+                                  Function<List<CellData>, String> converter) throws IOException {
+        if (!path.exists()) path.mkdirs();
+        var output = new File(path, fileName);
+        if (output.exists()) output.delete();
+        //Check info flag
+        if (fileName.charAt(30) == '0') {
+            output.createNewFile();
+        } else {
+            //Exports using the provided converter.
+            try (var fos = new FileOutputStream(output, false);
+                 var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
+                worksheet.getData().get(0).getRowData()
+                        .stream()
+                        .skip(skipHeader)
+                        .map(RowData::getValues)
+                        .filter(ignoreBlank())
+                        .map(converter)
+                        .forEachOrdered(ps::print);
+            }
+        }
+    }
+
+    /**
+     * Utility method to detect the empty flag at cell A1.
+     *
+     * @param worksheet the worksheet.
+     * @return true if A1 is true.
+     */
+    public static boolean infoFlag(Sheet worksheet) {
+        return worksheet.getData()
+                .get(0)
+                .getRowData()
+                .stream()
+                .map(RowData::getValues)
+                .filter(r -> !r.isEmpty())
+                .map(r -> r.get(0))
+                .map(CellData::getEffectiveValue)
+                .map(ExtendedValue::getBoolValue)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find A1 cell in worksheet."));
+    }
 }

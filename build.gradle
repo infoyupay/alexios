@@ -40,16 +40,20 @@ test {
     useJUnitPlatform()
     doFirst {
         jvmArgs = [
-                '--module-path', classpath.asPath
+                '--module-path', classpath.asPath,
+                '--enable-preview'
         ]
     }
 }
 
 compileJava {
     inputs.property("moduleName", "alexios.main")
+    sourceCompatibility = 16
+    targetCompatibility = 16
     doFirst {
         options.compilerArgs = [
-                '--module-path', classpath.asPath
+                '--module-path', classpath.asPath,
+                '--enable-preview'
         ]
         classpath = files()
     }
@@ -62,7 +66,8 @@ compileTestJava {
                 '--module-path', classpath.asPath,
                 '--add-modules', 'org.junit.jupiter.api',
                 '--add-reads', "alexios.main=org.junit.jupiter.api",
-                '--patch-module', "alexios.main=" + files(sourceSets.test.java.srcDirs).asPath
+                '--patch-module', "alexios.main=" + files(sourceSets.test.java.srcDirs).asPath,
+                '--enable-preview'
         ]
         classpath = files()
     }
