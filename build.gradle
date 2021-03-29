@@ -41,7 +41,6 @@ test {
     doFirst {
         jvmArgs = [
                 '--module-path', classpath.asPath,
-                '--enable-preview'
         ]
     }
 }
@@ -53,7 +52,6 @@ compileJava {
     doFirst {
         options.compilerArgs = [
                 '--module-path', classpath.asPath,
-                '--enable-preview'
         ]
         classpath = files()
     }
@@ -67,7 +65,6 @@ compileTestJava {
                 '--add-modules', 'org.junit.jupiter.api',
                 '--add-reads', "alexios.main=org.junit.jupiter.api",
                 '--patch-module', "alexios.main=" + files(sourceSets.test.java.srcDirs).asPath,
-                '--enable-preview'
         ]
         classpath = files()
     }

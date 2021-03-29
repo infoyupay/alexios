@@ -15,38 +15,29 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dvidal.alexios.api.impl.costs;
+package org.dvidal.alexios.api.impl.pdt710;
 
 import com.google.api.services.sheets.v4.model.CellData;
 
 import java.util.List;
-import java.util.function.Function;
-
-import static org.dvidal.alexios.google.GoogleUtils.*;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
- * Inner function to take a row as a {@code List<CellData>} and convert
- * it into a pretty plain text tuple as specified by PLE 100200 book.
+ * Convenient filter to retain only those elements
+ * with given flag.
  *
+ * @param flag  The flag to find.
+ * @param index the column index (0-based) where flag is.
  * @version 1.0
  */
-final record LE1002Converter(String year) implements Function<List<CellData>, String> {
-    /**
-     * Default constructor.
-     *
-     * @param year the tax period year.
-     */
-    LE1002Converter {
-    }
-
+record FlagFilter(int index, String flag) implements Predicate<List<CellData>> {
     @Override
-    public String apply(List<CellData> cellData) {
-        var line = new String[9];
-        line[0] = "%s%02d00".formatted(year, intFromCell(cellData.get(0)));
-        line[1] = "%.2f".formatted(doubleFromCell(cellData.get(2)));
-        readDoubleAhead(line, 2, 6, cellData);
-        line[7] = "1";
-        line[8] = "\r\n";
-        return String.join("|", line);
+    public boolean test(List<CellData> cellData) {
+        return Optional.ofNullable(cellData.get(index))
+                .map(CellData::getFormattedValue)
+                .map(String::strip)
+                .filter(flag::equals)
+                .isPresent();
     }
 }

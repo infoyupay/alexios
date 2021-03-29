@@ -31,19 +31,14 @@ import static org.dvidal.alexios.google.GoogleUtils.readDoubleBehind;
  *
  * @version 1.0
  */
-final class LE1003Converter implements Function<List<CellData>, String> {
-    /**
-     * The year of the tax period as YYYY0000
-     */
-    private final String year;
-
+final record LE1003Converter(String year) implements Function<List<CellData>, String> {
     /**
      * Default constructor. "0000" will be appended to
      * the year to match PLE specification.
      *
      * @param year the year of the tax Period.
      */
-    public LE1003Converter(String year) {
+    LE1003Converter(String year) {
         this.year = year + "0000";
     }
 
