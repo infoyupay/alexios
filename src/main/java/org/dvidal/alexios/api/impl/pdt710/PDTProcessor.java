@@ -52,6 +52,7 @@ public class PDTProcessor implements BookProcessor {
         do030600(firstSheetByName("030600", spreadsheet), params, target);
         do031200(firstSheetByName("031200", spreadsheet), params, target);
         do031300(firstSheetByName("031300", spreadsheet), params, target);
+        doTrial031700(firstSheetByName("031700", spreadsheet), params, target);
     }
 
     private BigDecimal getLimit(BigDecimal uit) {
@@ -149,6 +150,25 @@ public class PDTProcessor implements BookProcessor {
                 "47",
                 PDTFieldProcessor.payableOthers(),
                 target);
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    private void doTrial031700(Sheet aSheet, PDTParams params, File target) throws IOException {
+        var output = new File(target, new TrialNameCompiler(params).get());
+        if (output.exists()) output.delete();
+        if (!readInfoFlag(aSheet)) return;
+        try (var fos = new FileOutputStream(output);
+             var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
+            aSheet.getData().get(0)
+                    .getRowData()
+                    .stream()
+                    .skip(3)
+                    .map(RowData::getValues)
+                    .filter(ignoreBlank())
+                    .filter(c -> !c.get(0).getFormattedValue().strip().equals("89"))
+                    .map(new TrialProcessor())
+                    .forEach(ps::print);
+        }
     }
 
     /**

@@ -126,8 +126,17 @@ public class GoogleUtils {
      * @return an int value from cell, or 09 if null.
      */
     public static int intFromCell(CellData cell) {
-        var r = cell.getEffectiveValue().getNumberValue();
-        return r == null ? 0 : r.intValue();
+        return Optional.ofNullable(cell.getEffectiveValue())
+                .map(ExtendedValue::getNumberValue)
+                .map(Double::intValue)
+                .orElse(0);
+    }
+
+    public static BigDecimal decimalFrom(CellData cell) {
+        return Optional.ofNullable(cell.getEffectiveValue())
+                .map(ExtendedValue::getNumberValue)
+                .map(BigDecimal::valueOf)
+                .orElse(BigDecimal.ZERO);
     }
 
     /**
