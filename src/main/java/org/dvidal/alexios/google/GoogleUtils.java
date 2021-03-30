@@ -32,10 +32,13 @@ import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -96,7 +99,7 @@ public class GoogleUtils {
      * @throws IOException              if thrown by getCredentials.
      * @throws GeneralSecurityException if thrown by GoogleNetHttpTransport.newTrustedTransport.
      */
-    public static Spreadsheet getSheet(final String spreadSheetID) throws IOException, GeneralSecurityException {
+    public static Spreadsheet getSpreadsheet(final String spreadSheetID) throws IOException, GeneralSecurityException {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
         final var service = new Sheets
                 .Builder(transport, JSON_FACTORY, getCredentials(transport))
@@ -269,5 +272,56 @@ public class GoogleUtils {
                 .map(ExtendedValue::getBoolValue)
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find A1 cell in worksheet."));
+    }
+
+    public static GridData firstGridByName(String sheet, Spreadsheet spreadsheet) {
+        return firstGridAs(sheet, spreadsheet)
+                .orElseThrow(() -> noSheet(sheet));
+    }
+
+    public static Optional<GridData> firstGridAs(String sheet, Spreadsheet spreadsheet) {
+        return firstSheetAs(sheet, spreadsheet)
+                .map(Sheet::getData)
+                .map(l -> l.get(0));
+    }
+
+    public static Optional<Sheet> firstSheetAs(String sheet, Spreadsheet spreadsheet) {
+        return spreadsheet.getSheets().stream()
+                .filter(s -> Objects.equals(sheet, s.getProperties().getTitle()))
+                .findFirst();
+    }
+
+    public static Sheet firstSheetByName(String sheet, Spreadsheet spreadsheet) {
+        return firstSheetAs(sheet, spreadsheet)
+                .orElseThrow(() -> noSheet(sheet));
+    }
+
+    public static String stringAt(GridData data, int row, int column) {
+        return Optional.ofNullable(data.getRowData())
+                .map(r -> r.get(row))
+                .map(RowData::getValues)
+                .map(l -> l.get(column))
+                .map(CellData::getFormattedValue)
+                .orElseThrow(() -> noCell(row, column));
+    }
+
+    public static BigDecimal decimalAt(GridData data, int row, int column) {
+        return Optional.ofNullable(data.getRowData())
+                .map(r -> r.get(row))
+                .map(RowData::getValues)
+                .map(l -> l.get(column))
+                .map(CellData::getEffectiveValue)
+                .map(ExtendedValue::getNumberValue)
+                .map(BigDecimal::valueOf)
+                .orElse(BigDecimal.ZERO);
+    }
+
+    public static IllegalArgumentException noCell(int row, int column) {
+        return new IllegalArgumentException("Cannot find cell at row %d; column %d."
+                .formatted(row, column));
+    }
+
+    public static IllegalArgumentException noSheet(String sheetName) {
+        return new IllegalArgumentException("Cannot find sheet with name: " + sheetName);
     }
 }

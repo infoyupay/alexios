@@ -47,7 +47,7 @@ class GoogleUtilsTest {
 
     @Test
     void spreadSheetTest() throws Exception {
-        var sheet = GoogleUtils.getSheet(SHEET_ID);
+        var sheet = GoogleUtils.getSpreadsheet(SHEET_ID);
         sheet.getSheets()
                 .stream()
                 .map(Sheet::getProperties)

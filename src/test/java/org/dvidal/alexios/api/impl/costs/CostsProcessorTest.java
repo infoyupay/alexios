@@ -27,7 +27,7 @@ class CostsProcessorTest {
 
     @Test
     void testExport() throws Exception {
-        var sheet = GoogleUtils.getSheet(costID);
+        var sheet = GoogleUtils.getSpreadsheet(costID);
         var output = new File("testout", "LE100000");
         if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
         new CostsProcessor().processSheet(sheet, output);

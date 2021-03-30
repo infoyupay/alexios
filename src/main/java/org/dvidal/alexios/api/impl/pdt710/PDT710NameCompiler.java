@@ -15,21 +15,22 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dvidal.alexios.api.impl;
+package org.dvidal.alexios.api.impl.pdt710;
 
-import org.dvidal.alexios.google.GoogleUtils;
-import org.junit.jupiter.api.Test;
+import java.util.function.Supplier;
 
-import java.io.File;
-
-class AssetsTest {
-    static final String assetID = "1f4IlMSLRutavYJeyEx0G4jy2OdnSNLt8iQ8rl6HcBXg";
-
-    @Test
-    void testAssets() throws Exception {
-        var sheet = GoogleUtils.getSpreadsheet(assetID);
-        var output = new File("testout", "LE070000");
-        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
-        new AssetsProcessor().processSheet(sheet, output);
+/**
+ * A supplier which solely purpose is to provide with the appropiate
+ * valid name for PDT710 importation specification.
+ *
+ * @param field the field code as an int.
+ * @param ruc   the ruc number (tax ID).
+ * @param year  the year of tax period as a String.
+ * @version 1.0
+ */
+record PDT710NameCompiler(String year, String ruc, int field) implements Supplier<String> {
+    @Override
+    public String get() {
+        return "0710%s%s%03d.txt".formatted(year, ruc, field);
     }
 }

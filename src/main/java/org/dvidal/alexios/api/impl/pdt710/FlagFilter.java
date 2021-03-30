@@ -27,17 +27,27 @@ import java.util.function.Predicate;
  * Convenient filter to retain only those elements
  * with given flag.
  *
- * @param flag  The flag to find.
+ * @param flag  The flag to find. If less than zero, will ever return true.
  * @param index the column index (0-based) where flag is.
  * @version 1.0
  */
 record FlagFilter(int index, String flag) implements Predicate<List<CellData>> {
     @Override
     public boolean test(List<CellData> cellData) {
-        return Optional.ofNullable(cellData.get(index))
-                .map(CellData::getFormattedValue)
-                .map(String::strip)
-                .filter(flag::equals)
-                .isPresent();
+        //Check if first column is null, empty or blank.
+        //If so, ignore row by returning false.
+        if (cellData.isEmpty()) return false;
+        var first = cellData.get(0).getFormattedValue();
+        if (first==null || first.isBlank()) return false;
+
+        //Check data
+        return index < 0 //If index is less than 0, no flag column is present, always true.
+                ||
+                (cellData.size() > index
+                        && Optional.ofNullable(cellData.get(index))
+                        .map(CellData::getFormattedValue)
+                        .map(String::strip)
+                        .filter(flag::equals)
+                        .isPresent());
     }
 }

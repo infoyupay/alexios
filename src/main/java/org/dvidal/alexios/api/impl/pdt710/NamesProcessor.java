@@ -41,11 +41,27 @@ record NamesProcessor(int index) implements BiConsumer<List<CellData>, PDTField>
             pdtField.legalName = cellData.get(index).getFormattedValue();
         } else {
             pdtField.inputFlag = "1";
-            var nameParts = cellData.get(index).getFormattedValue().split(",");
-            pdtField.name = nameParts[1];
-            var lastParts = nameParts[1].split(" ", 2);
-            pdtField.lastName1 = lastParts[0];
-            if (lastParts.length > 1) pdtField.lastName2 = lastParts[1];
+            var nameFull = cellData.get(index).getFormattedValue();
+            if (nameFull.contains(",")) {
+                var nameParts = nameFull.split(",");
+                pdtField.name = nameParts[1];
+                var lastParts = nameParts[0].split(" ", 2);
+                pdtField.lastName1 = lastParts[0];
+                if (lastParts.length ==2) pdtField.lastName2 = lastParts[1];
+            } else {
+                var spacedParts = nameFull.split(" ", 3);
+                switch (spacedParts.length) {
+                    case 3 -> {
+                        pdtField.lastName1 = spacedParts[0];
+                        pdtField.lastName2 = spacedParts[1];
+                        pdtField.name = spacedParts[2];
+                    }
+                    case 2 -> {
+                        pdtField.lastName1 = spacedParts[0];
+                        pdtField.name = spacedParts[1];
+                    }
+                }
+            }
         }
     }
 }

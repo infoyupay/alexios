@@ -17,21 +17,19 @@
 
 package org.dvidal.alexios.api.impl.pdt710;
 
-import com.google.api.services.sheets.v4.model.CellData;
+import org.dvidal.alexios.google.GoogleUtils;
+import org.junit.jupiter.api.Test;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.function.Function;
+import java.io.File;
 
-record PDT404_405Processor() implements Function<List<CellData>, PDTField> {
-    private static final NamesProcessor onName = new NamesProcessor(4);
-    @Override
-    public PDTField apply(List<CellData> cellData) {
-        var r = new PDTField();
-        r.parseDoiType(cellData.get(0).getFormattedValue());
-        r.doiNum = cellData.get(2).getFormattedValue();
-        onName.accept(cellData, r);
-        r.amount = BigDecimal.valueOf(cellData.get(5).getEffectiveValue().getNumberValue());
-        return r;
+class PDT710ProcessorTest {
+    static final String balanceID = "1qiDvCzouLdvmXCVoNwBf4yHSxFrSyh0IRKfMzm2tFdk";
+
+    @Test
+    void testExport() throws Exception {
+        var sheet = GoogleUtils.getSpreadsheet(balanceID);
+        var output = new File("testout", "PDT710");
+        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
+        new PDTProcessor().processSheet(sheet, output);
     }
 }

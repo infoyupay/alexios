@@ -72,6 +72,10 @@ class PDTField {
         return this;
     }
 
+    public PDTField reduceAmount(PDTField another) {
+        return sumAmount(another.amount);
+    }
+
     /**
      * Converts a DOIType from a pleID to the PDT710 spec code.
      * Then, sets the converted value into this instance.
@@ -80,6 +84,7 @@ class PDTField {
      * @return this instance.
      */
     public PDTField parseDoiType(String pleID) {
+
         doiType = switch (pleID) {
             case "1" -> "01";
             case "4" -> "04";
@@ -101,8 +106,12 @@ class PDTField {
                 .add("%.20S".formatted(lastName2))
                 .add("%.20S".formatted(name))
                 .add("%.40S".formatted(legalName))
-                .add("%.2f".formatted(amount))
+                .add("%.0f".formatted(amount))
                 .toString();
+    }
+
+    public BigDecimal toAmount() {
+        return amount;
     }
 
     @Override
