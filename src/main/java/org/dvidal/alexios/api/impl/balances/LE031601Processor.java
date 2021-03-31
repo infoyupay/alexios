@@ -27,8 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalAt;
-import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
+import static org.dvidal.alexios.google.GoogleUtils.*;
 
 record LE031601Processor(Params03 params,
                          File target,
@@ -37,8 +36,7 @@ record LE031601Processor(Params03 params,
     public File call() throws IOException {
         var r = new File(target,
                 params.compileFile("031601", infoFlag(aSheet)));
-        if (r.exists() && !r.delete())
-            throw new IOException("File already exists but cannot be deleted: " + r);
+        recreateFile(r);
         try (var fos = new FileOutputStream(r);
              var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
             var grid = aSheet.getData().get(0);

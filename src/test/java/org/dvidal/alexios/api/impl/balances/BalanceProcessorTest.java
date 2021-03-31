@@ -17,31 +17,19 @@
 
 package org.dvidal.alexios.api.impl.balances;
 
-import com.google.api.services.sheets.v4.model.Sheet;
 import org.dvidal.alexios.google.GoogleUtils;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.Callable;
 
-import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
-import static org.dvidal.alexios.google.GoogleUtils.recreateFileIf;
+class BalanceProcessorTest {
+    static final String balanceID = "1qiDvCzouLdvmXCVoNwBf4yHSxFrSyh0IRKfMzm2tFdk";
 
-record LE0323Processor(Params03 params,
-                       File target,
-                       Sheet aSheet) implements Callable<File> {
-
-    @Override
-    public File call() throws Exception {
-        var iflg = infoFlag(aSheet);
-        var r = new File(target, params.compileFile(
-                "032300",
-                iflg,
-                "pdf"));
-        recreateFileIf(r, !iflg);
-
-        var driveToken = GoogleUtils.stringAt(aSheet.getData().get(0), 2, 2);
-        GoogleUtils.downloadDriveFile(driveToken, r);
-        return r;
+    @Test
+    void testExport() throws Exception {
+        var sheet = GoogleUtils.getSpreadsheet(balanceID);
+        var output = new File("testout", "LE030000");
+        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
+        new BalanceProcessor().processSheet(sheet, output);
     }
 }

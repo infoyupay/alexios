@@ -152,11 +152,10 @@ public final class PDTProcessor implements BookProcessor {
                 target);
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void doTrial031700(Sheet aSheet, PDTParams params, File target) throws IOException {
-        var output = new File(target, new TrialNameCompiler(params).get());
-        if (output.exists()) output.delete();
         if (!readInfoFlag(aSheet)) return;
+        var output = new File(target, new TrialNameCompiler(params).get());
+        recreateFile(output);
         try (var fos = new FileOutputStream(output);
              var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
             aSheet.getData().get(0)
@@ -217,7 +216,6 @@ public final class PDTProcessor implements BookProcessor {
      * then the header skip parameter may be required. That paremeter was to state
      * how many rows were header decorations and, thus, should be skipped from reading.
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void writeToFile(Sheet aSheet,
                              PDTParams params,
                              boolean checkAbs,
@@ -242,7 +240,7 @@ public final class PDTProcessor implements BookProcessor {
         //2. Check and delete output file.
         var output = new File(target,
                 new PDT710NameCompiler(params.year(), params.ruc(), fieldNum).get());
-        if (output.exists()) output.delete();
+        recreateFile(output);
 
         //3. Open to write.
         try (var fos = new FileOutputStream(output);

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
+import static org.dvidal.alexios.google.GoogleUtils.decimalText;
 
 /**
  * Function to convert financial status reports (except equity changes report).
@@ -34,10 +34,11 @@ record FinancialConverter(Params03 params) implements Function<List<CellData>, S
     @Override
     public String apply(List<CellData> cellData) {
         return new StringJoiner("|")
-                .add(params.periodID())
-                .add("01")
-                .add(cellData.get(2).getFormattedValue())
-                .add("%.2f".formatted(decimalFrom(cellData.get(3))))
+                .add(params.periodID())//1
+                .add("01")//2
+                .add(cellData.get(2).getFormattedValue())//3
+                .add(decimalText(cellData.get(3)))//4
+                .add("1")//5
                 .add("\r\n")
                 .toString();
     }

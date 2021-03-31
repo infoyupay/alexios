@@ -45,7 +45,7 @@ final class LE0312Converter implements Function<List<CellData>, String> {
                 .add(cellData.get(2).getFormattedValue())//5
                 .add(fromDateCell(cellData.get(3)))//6
                 .add("%.100s".formatted(cellData.get(4).getFormattedValue()))//7
-                .add("%.2f".formatted(decimalFrom(cellData.get(5))))//8
+                .add(decimalText(cellData.get(5)))//8
                 .add("1")//9
                 .add(safeText(cellData, 6))//10
                 .add("\r\n")

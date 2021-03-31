@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static java.math.RoundingMode.HALF_EVEN;
-import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
+import static org.dvidal.alexios.google.GoogleUtils.intFromCell;
 
 /**
  * Processor to read data from a google spreadsheet row into
@@ -39,12 +38,12 @@ final class TrialProcessor implements Function<List<CellData>, String> {
     public String apply(List<CellData> cellData) {
         return new StringJoiner("|")
                 .add(cellData.get(0).getFormattedValue())
-                .add("%d".formatted(decimalFrom(cellData.get(2)).setScale(0, HALF_EVEN).intValueExact()))
-                .add("%d".formatted(decimalFrom(cellData.get(3)).setScale(0, HALF_EVEN).intValueExact()))
-                .add("%d".formatted(decimalFrom(cellData.get(4)).setScale(0, HALF_EVEN).intValueExact()))
-                .add("%d".formatted(decimalFrom(cellData.get(5)).setScale(0, HALF_EVEN).intValueExact()))
-                .add("%d".formatted(decimalFrom(cellData.get(10)).setScale(0, HALF_EVEN).intValueExact()))
-                .add("%d".formatted(decimalFrom(cellData.get(11)).setScale(0, HALF_EVEN).intValueExact()))
+                .add("%d".formatted(intFromCell(cellData.get(2))))
+                .add("%d".formatted(intFromCell(cellData.get(3))))
+                .add("%d".formatted(intFromCell(cellData.get(4))))
+                .add("%d".formatted(intFromCell(cellData.get(5))))
+                .add("%d".formatted(intFromCell(cellData.get(10))))
+                .add("%d".formatted(intFromCell(cellData.get(11))))
                 .add("0")
                 .add("0")
                 .add("\r\n")

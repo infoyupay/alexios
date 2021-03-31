@@ -45,10 +45,10 @@ final class LE0308Converter implements Function<List<CellData>, String> {
                 .add(cellData.get(2).getFormattedValue())//5
                 .add("%.100s".formatted(cellData.get(3).getFormattedValue()))//6
                 .add(cellData.get(4).getFormattedValue())//7
-                .add("%.2f".formatted(decimalFrom(cellData.get(6))))//8
+                .add(decimalText(cellData.get(6)))//8
                 .add("%d".formatted(intFromCell(cellData.get(7))))//9
-                .add("%.2f".formatted(decimalFrom(cellData.get(8))))//10
-                .add("%.2f".formatted(decimalFrom(cellData.get(9))))//11
+                .add(decimalText(cellData.get(8)))//10
+                .add(decimalText(cellData.get(9)))//11
                 .add("1")//12
                 .add(safeText(cellData, 10))
                 .add("\r\n")

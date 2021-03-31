@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
+import static org.dvidal.alexios.google.GoogleUtils.decimalText;
 
 record LE031700Converter(Params03 params) implements Function<List<CellData>, String> {
     @Override
@@ -31,22 +31,22 @@ record LE031700Converter(Params03 params) implements Function<List<CellData>, St
         return new StringJoiner("|")
                 .add(params().periodID())//1
                 .add(cellData.get(0).getFormattedValue())//2
-                .add("%.2f".formatted(decimalFrom(cellData.get(2))))//3
-                .add("%.2f".formatted(decimalFrom(cellData.get(3))))//4
-                .add("%.2f".formatted(decimalFrom(cellData.get(4))))//5
-                .add("%.2f".formatted(decimalFrom(cellData.get(5))))//6
-                .add("%.2f".formatted(decimalFrom(cellData.get(6))))//7
-                .add("%.2f".formatted(decimalFrom(cellData.get(7))))//8
-                .add("%.2f".formatted(decimalFrom(cellData.get(8))))//9
-                .add("%.2f".formatted(decimalFrom(cellData.get(9))))//10
-                .add("%.2f".formatted(decimalFrom(cellData.get(10))))//11
-                .add("%.2f".formatted(decimalFrom(cellData.get(11))))//12
-                .add("%.2f".formatted(decimalFrom(cellData.get(12))))//13
-                .add("%.2f".formatted(decimalFrom(cellData.get(13))))//14
-                .add("%.2f".formatted(decimalFrom(cellData.get(14))))//15
-                .add("%.2f".formatted(decimalFrom(cellData.get(15))))//16
-                .add("%.2f".formatted(decimalFrom(cellData.get(16))))//17
-                .add("%.2f".formatted(decimalFrom(cellData.get(17))))//18
+                .add(decimalText(cellData.get(2)))//3
+                .add(decimalText(cellData.get(3)))//4
+                .add(decimalText(cellData.get(4)))//5
+                .add(decimalText(cellData.get(5)))//6
+                .add(decimalText(cellData.get(6)))//7
+                .add(decimalText(cellData.get(7)))//8
+                .add(decimalText(cellData.get(8)))//9
+                .add(decimalText(cellData.get(9)))//10
+                .add(decimalText(cellData.get(10)))//11
+                .add(decimalText(cellData.get(11)))//12
+                .add(decimalText(cellData.get(12)))//13
+                .add(decimalText(cellData.get(13)))//14
+                .add(decimalText(cellData.get(14)))//15
+                .add(decimalText(cellData.get(15)))//16
+                .add(decimalText(cellData.get(16)))//17
+                .add(decimalText(cellData.get(17)))//18
                 .add("1")//19
                 .add("\r\n")
                 .toString();

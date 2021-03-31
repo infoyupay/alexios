@@ -23,8 +23,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
-import static org.dvidal.alexios.google.GoogleUtils.intFromCell;
+import static org.dvidal.alexios.google.GoogleUtils.*;
 
 record LE031602Converter(Params03 params) implements Function<List<CellData>, String> {
     @Override
@@ -36,7 +35,7 @@ record LE031602Converter(Params03 params) implements Function<List<CellData>, St
                 .add(cellData.get(3).getFormattedValue())//4
                 .add("%.100s".formatted(cellData.get(5).getFormattedValue()))//5
                 .add("%d".formatted(intFromCell(cellData.get(6))))//6
-                .add("%.8f".formatted(decimalFrom(cellData.get(7))))//7
+                .add(decimalText1602(cellData.get(7)))//7
                 .add("1")//8
                 .add("\r\n")
                 .toString();

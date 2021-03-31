@@ -37,7 +37,8 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -51,6 +52,20 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class GoogleUtils {
+    public static final DecimalFormatSymbols PLE_SYM = new DecimalFormatSymbols() {
+
+        @Override
+        public char getDecimalSeparator() {
+            return '.';
+        }
+
+        @Override
+        public char getMonetaryDecimalSeparator() {
+            return '.';
+        }
+    };
+    public static final DecimalFormat PLE_FMT = new DecimalFormat("###0.00", PLE_SYM);
+    public static final DecimalFormat PLE_1602_7_FMT = new DecimalFormat("###0.00000000", PLE_SYM);
     /**
      * The application name, which is alexios.
      */
@@ -66,15 +81,16 @@ public class GoogleUtils {
     /**
      * A singleton scope to read spreadsheets.
      */
-    public static final List<String> SCOPES_SHEETS = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
-    /**
-     * /** A singleton scope to read google drive files.
-     */
-    public static final List<String> SCOPES_DRIVE = Collections.singletonList(DriveScopes.DRIVE_FILE);
+    public static final List<String> SCOPES = List.of(SheetsScopes.SPREADSHEETS_READONLY, DriveScopes.DRIVE_READONLY);
     /**
      * A resource path to credentials.json file.
      */
     public static final String CREDENTIALS_PATH = "/credentials.json";
+
+    static {
+        PLE_FMT.setParseBigDecimal(true);
+        PLE_1602_7_FMT.setParseBigDecimal(true);
+    }
 
     /**
      * Utility method to create credentials for Google API.
@@ -84,7 +100,7 @@ public class GoogleUtils {
      * @throws IOException if the credentials resources cannot be loaded.
      */
     public static Credential getCredentialsSheets(final NetHttpTransport transport) throws IOException {
-        return getCredentials(transport, SCOPES_SHEETS);
+        return getCredentials(transport, SCOPES);
     }
 
     /**
@@ -95,7 +111,7 @@ public class GoogleUtils {
      * @throws IOException if the credentials resources cannot be loaded.
      */
     public static Credential getCredentialsDrive(final NetHttpTransport transport) throws IOException {
-        return getCredentials(transport, SCOPES_DRIVE);
+        return getCredentials(transport, SCOPES);
     }
 
     public static Credential getCredentials(final NetHttpTransport transport, final List<String> scopes) throws IOException {
@@ -133,11 +149,11 @@ public class GoogleUtils {
 
     public static void downloadDriveFile(final String driveID, final File target) throws IOException, GeneralSecurityException {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
-        final var service = new Drive.Builder(transport, JSON_FACTORY, getCredentialsSheets(transport))
+        final var service = new Drive.Builder(transport, JSON_FACTORY, getCredentialsDrive(transport))
                 .setApplicationName(APP_NAME)
                 .build();
 
-        try(var fos = new FileOutputStream(target)) {
+        try (var fos = new FileOutputStream(target)) {
             service.files().get(driveID).executeMediaAndDownloadTo(fos);
         }
     }
@@ -167,21 +183,34 @@ public class GoogleUtils {
     }
 
     /**
-     * Utility method to safely extract a BigDecimal from a CellData object.
-     * If the cell is null, or empty at some point, no ZERO will be returned.
+     * Utility method to safely extract a BigDecimal from a CellData object
+     * and format according to PLE specification (###0.00).
+     * If the cell is null, or empty at some point, 0 will be returned.
      * Otherwise, will extract the number value and build a BigDecimal from it
-     * using {@link BigDecimal#valueOf(double)}. If the cell doesn't contain
-     * a number value, ZERO will be returned as well.
+     * using {@link BigDecimal#valueOf(double)}, then will format to String
+     * using the constant {@link #PLE_FMT}. If the cell doesn't contain
+     * a number value, "0.00" will be returned as well.
      *
      * @param cell the cell object.
-     * @return cell number value or ZERO.
+     * @return text from cell value as PLE specs or empty String.
      */
-    public static BigDecimal decimalFrom(CellData cell) {
+    public static String decimalText(CellData cell) {
+        return decimalIn(cell)
+                .map(PLE_FMT::format)
+                .orElse("0.00");
+    }
+
+    public static String decimalText1602(CellData cell) {
+        return decimalIn(cell)
+                .map(PLE_1602_7_FMT::format)
+                .orElse("0.00000000");
+    }
+
+    public static Optional<BigDecimal> decimalIn(CellData cell) {
         return Optional.ofNullable(cell)
                 .map(CellData::getEffectiveValue)
                 .map(ExtendedValue::getNumberValue)
-                .map(BigDecimal::valueOf)
-                .orElse(BigDecimal.ZERO);
+                .map(BigDecimal::valueOf);
     }
 
     /**
@@ -289,7 +318,7 @@ public class GoogleUtils {
                                   Function<List<CellData>, String> converter) throws IOException {
         if (!path.exists()) path.mkdirs();
         var output = new File(path, fileName);
-        if (output.exists()) output.delete();
+        recreateFile(output);
         //Check info flag
         if (fileName.charAt(30) == '0') {
             output.createNewFile();
@@ -306,6 +335,32 @@ public class GoogleUtils {
                         .forEachOrdered(ps::print);
             }
         }
+    }
+
+    /**
+     * Utility method to check if a file exists and delete.
+     * The, even if file didn't exist, will "touch" (create) it.
+     *
+     * @param aFile the file to check.
+     * @throws IOException if cannot delete or create.
+     */
+    public static void recreateFile(File aFile) throws IOException {
+        recreateFileIf(aFile, true);
+    }
+
+    /**
+     * Utility method to check if a file exists and delete.
+     * The, even if file didn't exist, will "touch" (create) it.
+     *
+     * @param aFile the file to check.
+     * @param flag  flag to state if should recreate or not.
+     * @throws IOException if cannot delete or create.
+     */
+    public static void recreateFileIf(File aFile, boolean flag) throws IOException {
+        if (aFile.exists() && !aFile.delete())
+            throw new IOException("File already exists but cannot be deleted: " + aFile);
+        if (flag && !aFile.createNewFile())
+            throw new IOException("Cannot touch file: " + aFile);
     }
 
     /**
@@ -385,7 +440,8 @@ public class GoogleUtils {
                 .skip(column)
                 .findFirst()
                 .map(CellData::getFormattedValue)
-                .orElse("");
+                .map(s -> s.replaceAll("/", "-"))
+                .orElse("-");
     }
 
     public static IllegalArgumentException noCell(int row, int column) {

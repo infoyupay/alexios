@@ -43,8 +43,8 @@ final class LE0309Converter implements Function<List<CellData>, String> {
                 .add(fromDateCell(cellData.get(0)))//4
                 .add(numericText(cellData.get(1)))//5
                 .add("%.40s".formatted(cellData.get(2).getFormattedValue()))//6
-                .add("%.2f".formatted(decimalFrom(cellData.get(3))))//7
-                .add("%.2f".formatted(decimalFrom(cellData.get(4))))//8
+                .add(decimalText(cellData.get(3)))//7
+                .add(decimalText(cellData.get(4)))//8
                 .add("1")//9
                 .add("\r\n")
                 .toString();

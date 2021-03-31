@@ -18,13 +18,13 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.CellData;
-import org.dvidal.alexios.google.GoogleUtils;
 
 import java.util.List;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
+import static org.dvidal.alexios.google.GoogleUtils.decimalText;
+import static org.dvidal.alexios.google.GoogleUtils.decimalText1602;
 
 record LE0307Converter(Params03 params) implements Function<List<CellData>, String> {
     @Override
@@ -39,9 +39,9 @@ record LE0307Converter(Params03 params) implements Function<List<CellData>, Stri
                 .add("%.80s".formatted(cellData.get(6).getFormattedValue()))//7
                 .add(cellData.get(7).getFormattedValue())//8
                 .add(cellData.get(9).getFormattedValue())//9
-                .add("%.8f".formatted(decimalFrom(cellData.get(11))))//10
-                .add("%.8f".formatted(decimalFrom(cellData.get(12))))//11
-                .add("%.8f".formatted(decimalFrom(cellData.get(13))))//12
+                .add(decimalText1602(cellData.get(11)))//10
+                .add(decimalText1602(cellData.get(12)))//11
+                .add(decimalText(cellData.get(13)))//12
                 .add("1")//13
                 .add("\r\n")
                 .toString();

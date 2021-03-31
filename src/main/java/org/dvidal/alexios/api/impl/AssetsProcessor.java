@@ -97,7 +97,6 @@ public class AssetsProcessor implements BookProcessor {
 
     }
 
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void exportFile(Sheet worksheet,
                             String bookID,
                             long skipHeader,
@@ -108,11 +107,10 @@ public class AssetsProcessor implements BookProcessor {
 
         var fnam = buildFnam(bookID, infoFlag);
         var output = new File(target, fnam);
-        if (output.exists()) output.delete();
+        recreateFile(output);
 
-        //If book is empty, create file and leave method.
+        //If book is empty, leave method.
         if (!infoFlag) {
-            output.createNewFile();
             return;
         }
 

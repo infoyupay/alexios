@@ -24,6 +24,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.function.Function;
 
+import static org.dvidal.alexios.google.GoogleUtils.decimalText;
 import static org.dvidal.alexios.google.GoogleUtils.fromDateCell;
 
 final class LE0306Converter implements Function<List<CellData>, String> {
@@ -47,7 +48,7 @@ final class LE0306Converter implements Function<List<CellData>, String> {
                 .add(cellData.get(6).getFormattedValue())//8
                 .add(cellData.get(7).getFormattedValue())//9
                 .add(fromDateCell(cellData.get(8)))//10
-                .add(cellData.get(9).getFormattedValue())//11
+                .add(decimalText(cellData.get(9)))//11
                 .add("1")//12
                 .add("\r\n")
                 .toString();

@@ -24,7 +24,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.function.Function;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
+import static org.dvidal.alexios.google.GoogleUtils.decimalText;
 import static org.dvidal.alexios.google.GoogleUtils.numericText;
 
 class LE0315Converter implements Function<List<CellData>, String> {
@@ -47,9 +47,9 @@ class LE0315Converter implements Function<List<CellData>, String> {
                 .add(cellData.get(3).getFormattedValue())//6
                 .add(numericText(cellData.get(4)))//7
                 .add(cellData.get(5).getFormattedValue())//8
-                .add("%.2f".formatted(decimalFrom(cellData.get(6))))//9
-                .add("%.2f".formatted(decimalFrom(cellData.get(7))))//10
-                .add("%.2f".formatted(decimalFrom(cellData.get(8))))//11
+                .add(decimalText(cellData.get(6)))//9
+                .add(decimalText(cellData.get(7)))//10
+                .add(decimalText(cellData.get(8)))//11
                 .add("1")//12
                 .add("\r\n")
                 .toString();

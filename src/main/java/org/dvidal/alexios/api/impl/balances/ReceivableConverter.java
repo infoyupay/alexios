@@ -44,7 +44,7 @@ final class ReceivableConverter implements Function<List<CellData>, String> {
                 .add(cellData.get(2).getFormattedValue())//5
                 .add("%.100s".formatted(cellData.get(3).getFormattedValue()))//6
                 .add(fromDateCell(cellData.get(4)))//7
-                .add("%.2f".formatted(decimalFrom(cellData.get(5))))//8
+                .add(decimalText(cellData.get(5)))//8
                 .add("1")//9
                 .add(safeText(cellData, 6))//10
                 .add("\r\n")
