@@ -34,10 +34,10 @@ import static org.dvidal.alexios.google.GoogleUtils.decimalFrom;
  * a specification was not provided, but a helper excel file with macros
  * gave hints on the structure and file naming.
  */
-class TrialProcessor implements Function<List<CellData>, String> {
+final class TrialProcessor implements Function<List<CellData>, String> {
     @Override
     public String apply(List<CellData> cellData) {
-        return new StringJoiner("|", "", "\r\n")
+        return new StringJoiner("|")
                 .add(cellData.get(0).getFormattedValue())
                 .add("%d".formatted(decimalFrom(cellData.get(2)).setScale(0, HALF_EVEN).intValueExact()))
                 .add("%d".formatted(decimalFrom(cellData.get(3)).setScale(0, HALF_EVEN).intValueExact()))
@@ -47,6 +47,7 @@ class TrialProcessor implements Function<List<CellData>, String> {
                 .add("%d".formatted(decimalFrom(cellData.get(11)).setScale(0, HALF_EVEN).intValueExact()))
                 .add("0")
                 .add("0")
+                .add("\r\n")
                 .toString();
     }
 }

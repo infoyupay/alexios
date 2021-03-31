@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Utility interface with useful constants for Google API.
@@ -132,8 +133,19 @@ public class GoogleUtils {
                 .orElse(0);
     }
 
+    /**
+     * Utility method to safely extract a BigDecimal from a CellData object.
+     * If the cell is null, or empty at some point, no ZERO will be returned.
+     * Otherwise, will extract the number value and build a BigDecimal from it
+     * using {@link BigDecimal#valueOf(double)}. If the cell doesn't contain
+     * a number value, ZERO will be returned as well.
+     *
+     * @param cell the cell object.
+     * @return cell number value or ZERO.
+     */
     public static BigDecimal decimalFrom(CellData cell) {
-        return Optional.ofNullable(cell.getEffectiveValue())
+        return Optional.ofNullable(cell)
+                .map(CellData::getEffectiveValue)
                 .map(ExtendedValue::getNumberValue)
                 .map(BigDecimal::valueOf)
                 .orElse(BigDecimal.ZERO);
@@ -323,6 +335,24 @@ public class GoogleUtils {
                 .map(ExtendedValue::getNumberValue)
                 .map(BigDecimal::valueOf)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    public static String numericText(CellData cell) {
+        return Optional.ofNullable(cell)
+                .map(CellData::getFormattedValue)
+                .stream().flatMapToInt(String::codePoints)
+                .filter(Character::isDigit)
+                .mapToObj(Character::toString)
+                .collect(Collectors.joining());
+    }
+
+    public static String safeText(List<CellData> data, int column) {
+        return data
+                .stream()
+                .skip(column)
+                .findFirst()
+                .map(CellData::getFormattedValue)
+                .orElse("");
     }
 
     public static IllegalArgumentException noCell(int row, int column) {

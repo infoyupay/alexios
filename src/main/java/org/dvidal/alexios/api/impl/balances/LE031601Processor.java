@@ -17,5 +17,23 @@
 
 package org.dvidal.alexios.api.impl.balances;
 
-public class LE0301Converter {
+import com.google.api.services.sheets.v4.model.Sheet;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.Callable;
+
+import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
+
+record LE031601Processor(Params03 params,
+                         File target,
+                         Sheet aSheet) implements Callable<File> {
+    @Override
+    public File call() throws IOException {
+        var r = new File(target,
+                params.compileFile("031601", infoFlag(aSheet)));
+        if (r.exists() && !r.delete())
+            throw new IOException("File already exists but cannot be deleted: " + r);
+        return r;
+    }
 }

@@ -26,7 +26,7 @@ import java.util.StringJoiner;
  *
  * @version 1.0
  */
-class PDTField {
+final class PDTField {
 
     /**
      * PDT710, Column 0.
@@ -81,9 +81,8 @@ class PDTField {
      * Then, sets the converted value into this instance.
      *
      * @param pleID the pleID.
-     * @return this instance.
      */
-    public PDTField parseDoiType(String pleID) {
+    void parseDoiType(String pleID) {
 
         doiType = switch (pleID) {
             case "1" -> "01";
@@ -93,7 +92,6 @@ class PDTField {
             case "A" -> "A";
             default -> "00";
         };
-        return this;
     }
 
     @Override
@@ -110,7 +108,7 @@ class PDTField {
                 .toString();
     }
 
-    public BigDecimal toAmount() {
+     BigDecimal toAmount() {
         return amount;
     }
 

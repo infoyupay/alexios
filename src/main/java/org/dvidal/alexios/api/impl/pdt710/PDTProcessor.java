@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets;
 
 import static org.dvidal.alexios.google.GoogleUtils.*;
 
-public class PDTProcessor implements BookProcessor {
+public final class PDTProcessor implements BookProcessor {
 
     @Override
     public String title() {
