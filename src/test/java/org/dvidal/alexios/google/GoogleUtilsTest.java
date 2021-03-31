@@ -32,7 +32,7 @@ class GoogleUtilsTest {
     void credentialAndReadTest() throws Exception {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
         final var range = "070000!B5";
-        var service = new Sheets.Builder(transport, GoogleUtils.JSON_FACTORY, GoogleUtils.getCredentials(transport))
+        var service = new Sheets.Builder(transport, GoogleUtils.JSON_FACTORY, GoogleUtils.getCredentialsSheets(transport))
                 .setApplicationName(GoogleUtils.APP_NAME)
                 .build();
         var response = service.spreadsheets().values()

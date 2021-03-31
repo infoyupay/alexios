@@ -27,6 +27,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
+import com.google.api.services.drive.Drive;
+import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
@@ -64,7 +66,11 @@ public class GoogleUtils {
     /**
      * A singleton scope to read spreadsheets.
      */
-    public static final List<String> SCOPES = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
+    public static final List<String> SCOPES_SHEETS = Collections.singletonList(SheetsScopes.SPREADSHEETS_READONLY);
+    /**
+     * /** A singleton scope to read google drive files.
+     */
+    public static final List<String> SCOPES_DRIVE = Collections.singletonList(DriveScopes.DRIVE_FILE);
     /**
      * A resource path to credentials.json file.
      */
@@ -77,12 +83,27 @@ public class GoogleUtils {
      * @return a credential to use in the app.
      * @throws IOException if the credentials resources cannot be loaded.
      */
-    public static Credential getCredentials(final NetHttpTransport transport) throws IOException {
+    public static Credential getCredentialsSheets(final NetHttpTransport transport) throws IOException {
+        return getCredentials(transport, SCOPES_SHEETS);
+    }
+
+    /**
+     * Utility method to create credentials for Google API.
+     *
+     * @param transport the GoogleAuthorizationCodeFlow http transport.
+     * @return a credential to use in the app.
+     * @throws IOException if the credentials resources cannot be loaded.
+     */
+    public static Credential getCredentialsDrive(final NetHttpTransport transport) throws IOException {
+        return getCredentials(transport, SCOPES_DRIVE);
+    }
+
+    public static Credential getCredentials(final NetHttpTransport transport, final List<String> scopes) throws IOException {
         var is = GoogleUtils.class.getResourceAsStream(CREDENTIALS_PATH);
         if (is == null)
             throw new FileNotFoundException("Resource not found " + CREDENTIALS_PATH);
         var secrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(is));
-        var flow = new GoogleAuthorizationCodeFlow.Builder(transport, JSON_FACTORY, secrets, SCOPES)
+        var flow = new GoogleAuthorizationCodeFlow.Builder(transport, JSON_FACTORY, secrets, scopes)
                 .setDataStoreFactory(new FileDataStoreFactory(new File(TOKENS_PATH)))
                 .setAccessType("offline")
                 .build();
@@ -91,6 +112,7 @@ public class GoogleUtils {
                 .build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
     }
+
 
     /**
      * Retrieves a Spreadsheet using the spreadSheet ID value.
@@ -103,10 +125,21 @@ public class GoogleUtils {
     public static Spreadsheet getSpreadsheet(final String spreadSheetID) throws IOException, GeneralSecurityException {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
         final var service = new Sheets
-                .Builder(transport, JSON_FACTORY, getCredentials(transport))
+                .Builder(transport, JSON_FACTORY, getCredentialsSheets(transport))
                 .setApplicationName(APP_NAME)
                 .build();
         return service.spreadsheets().get(spreadSheetID).setIncludeGridData(true).execute();
+    }
+
+    public static void downloadDriveFile(final String driveID, final File target) throws IOException, GeneralSecurityException {
+        final var transport = GoogleNetHttpTransport.newTrustedTransport();
+        final var service = new Drive.Builder(transport, JSON_FACTORY, getCredentialsSheets(transport))
+                .setApplicationName(APP_NAME)
+                .build();
+
+        try(var fos = new FileOutputStream(target)) {
+            service.files().get(driveID).executeMediaAndDownloadTo(fos);
+        }
     }
 
     /**

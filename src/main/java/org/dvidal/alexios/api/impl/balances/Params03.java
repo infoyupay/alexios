@@ -59,7 +59,11 @@ record Params03(String ruc,
     }
 
     public String compileFile(String bookID, boolean info) {
-        return "LE%s%s%s%s%s%s%s%s11.txt".formatted(
+        return compileFile(bookID, info, "txt");
+    }
+
+    public String compileFile(String bookID, boolean info, String extension) {
+        return "LE%s%s%s%s%s%s%s%s11.%s".formatted(
                 ruc,
                 year,
                 month,
@@ -67,6 +71,7 @@ record Params03(String ruc,
                 bookID,
                 oportunity,
                 opsFlag,
-                info ? "1" : "0");
+                info ? "1" : "0",
+                extension);
     }
 }

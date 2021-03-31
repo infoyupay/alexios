@@ -18,39 +18,33 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.Sheet;
+import org.dvidal.alexios.google.GoogleUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
-import static org.dvidal.alexios.google.GoogleUtils.decimalAt;
 import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
 
-record LE031601Processor(Params03 params,
-                         File target,
-                         Sheet aSheet) implements Callable<File> {
+record LE0323Processor(Params03 params,
+                       File target,
+                       Sheet aSheet) implements Callable<File> {
+
     @Override
-    public File call() throws IOException {
-        var r = new File(target,
-                params.compileFile("031601", infoFlag(aSheet)));
+    public File call() throws Exception {
+        var iflg = infoFlag(aSheet);
+        var r = new File(target, params.compileFile(
+                "032300",
+                iflg,
+                "pdf"));
         if (r.exists() && !r.delete())
             throw new IOException("File already exists but cannot be deleted: " + r);
-        try (var fos = new FileOutputStream(r);
-             var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
-            var grid = aSheet.getData().get(0);
-            ps.print(new StringJoiner("|")
-                    .add(params.periodID())//1
-                    .add("%.2f".formatted(decimalAt(grid, 3, 0)))//2
-                    .add("%.2f".formatted(decimalAt(grid, 3, 1)))//3
-                    .add("%.2f".formatted(decimalAt(grid, 3, 2)))//4
-                    .add("%.2f".formatted(decimalAt(grid, 3, 3)))//5
-                    .add("1")//6
-                    .add("\r\n"));
-        }
+
+        if (!iflg && !r.createNewFile())
+            throw new IOException("Cannot create empty file: " + r);
+
+        var driveToken = GoogleUtils.stringAt(aSheet.getData().get(0), 2, 2);
+        GoogleUtils.downloadDriveFile(driveToken, r);
         return r;
     }
 }
