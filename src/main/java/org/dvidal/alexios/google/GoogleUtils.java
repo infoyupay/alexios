@@ -159,8 +159,8 @@ public class GoogleUtils {
     /**
      * Retrieves a Spreadsheet using the spreadSheet ID value.
      *
-     * @param spreadSheetID the spreadsheet ID value.
-     * @return requested spreadsheet.
+     * @param spreadSheetID the sheetName ID value.
+     * @return requested sheetName.
      * @throws IOException              if thrown by getCredentials.
      * @throws GeneralSecurityException if thrown by GoogleNetHttpTransport.newTrustedTransport.
      */
@@ -442,10 +442,10 @@ public class GoogleUtils {
     }
 
     /**
-     * Get the first grid (sheet) object with given name in the spreadsheet.
+     * Get the first grid (sheet) object with given name in the sheetName.
      *
      * @param sheet       the required sheet name.
-     * @param spreadsheet the spreadsheet object.
+     * @param spreadsheet the sheetName object.
      * @return the grid data of given sheet name.
      * @throws IllegalArgumentException if there's no sheet with given sheet name.
      */
@@ -455,10 +455,10 @@ public class GoogleUtils {
     }
 
     /**
-     * Get the first grid (sheet) object with given name in the spreadsheet as an Optional.
+     * Get the first grid (sheet) object with given name in the sheetName as an Optional.
      *
      * @param sheet       the required sheet name.
-     * @param spreadsheet the spreadsheet object.
+     * @param spreadsheet the sheetName object.
      * @return the grid data of given sheet name.
      * @throws IllegalArgumentException if there's no sheet with given sheet name.
      */
@@ -472,7 +472,7 @@ public class GoogleUtils {
      * Get the first sheet object with given name as a worksheet Optional.
      *
      * @param sheet       the required name.
-     * @param spreadsheet the spreadsheet object.
+     * @param spreadsheet the sheetName object.
      * @return an optional with required sheet.
      */
     public static @NotNull Optional<Sheet> firstSheetAs(String sheet, @NotNull Spreadsheet spreadsheet) {
@@ -485,7 +485,7 @@ public class GoogleUtils {
      * Get the first sheet object with given name as a worksheet.
      *
      * @param sheet       the required name.
-     * @param spreadsheet the spreadsheet object.
+     * @param spreadsheet the sheetName object.
      * @return an optional with required sheet.
      * @throws IllegalArgumentException if no sheet with given name is found.
      */

@@ -52,7 +52,7 @@ public class AssetsProcessor implements BookProcessor {
 
     @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {
-        //Retrieve parameters from the 070000 spreadsheet.
+        //Retrieve parameters from the 070000 sheetName.
         retrieveParameters(spreadsheet);
         //Iterate thru spreadsheets.
         for (var worksheet : spreadsheet.getSheets()) {
@@ -83,7 +83,7 @@ public class AssetsProcessor implements BookProcessor {
      * Inner method to extract book parameters.
      * In the first sheet named 070000 of the workbook shall be ruc, year, period and opsFlag parameters.
      *
-     * @param spreadsheet the spreadsheet object.
+     * @param spreadsheet the sheetName object.
      * @throws IllegalArgumentException if there's no "070000" sheet.
      */
     private void retrieveParameters(@NotNull Spreadsheet spreadsheet)

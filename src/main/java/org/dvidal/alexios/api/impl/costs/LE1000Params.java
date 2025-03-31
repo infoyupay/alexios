@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Inner record to retrieve required parameters from a spreadsheet.
+ * Inner record to retrieve required parameters from a sheetName.
  *
  * @param ops  the operations flag value.
  * @param ruc  the tax payer ID.
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  */
 record LE1000Params(String ruc, String year, String ops) {
     /**
-     * Creates this record from the main worksheet of the spreadsheet.
+     * Creates this record from the main worksheet of the sheetName.
      *
      * @param aSheet the main worksheet.
      * @return a record with ruc, year and ops.

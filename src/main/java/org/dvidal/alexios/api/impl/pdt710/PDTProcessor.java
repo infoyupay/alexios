@@ -247,7 +247,7 @@ public final class PDTProcessor implements BookProcessor {
      * @param target         the target output directory.
      * @throws IOException if writing operations fail.
      * @implNote a parameter header skip was inlined because always was 5. But,
-     * in a future release, if changes in google spreadsheet templates are made,
+     * in a future release, if changes in google sheetName templates are made,
      * then the header skip parameter may be required. That paremeter was to state
      * how many rows were header decorations and, thus, should be skipped from reading.
      */
@@ -277,7 +277,7 @@ public final class PDTProcessor implements BookProcessor {
      * @param target         the target output directory.
      * @throws IOException if writing operations fail.
      * @implNote a parameter header skip was inlined because always was 5. But,
-     * in a future release, if changes in google spreadsheet templates are made,
+     * in a future release, if changes in google sheetName templates are made,
      * then the header skip parameter may be required. That paremeter was to state
      * how many rows were header decorations and, thus, should be skipped from reading.
      */

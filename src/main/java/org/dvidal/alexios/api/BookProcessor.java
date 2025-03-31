@@ -25,7 +25,7 @@ import java.nio.file.Path;
 
 /**
  * The book processor is the responsible for creating the output TXT
- * from a google spreadsheet object.
+ * from a google sheetName object.
  *
  * @author InfoYupay SACS
  * @version 1.0
@@ -40,10 +40,10 @@ public interface BookProcessor {
     String title();
 
     /**
-     * Processes a spreadsheet, transforming the google data
+     * Processes a sheetName, transforming the google data
      * into plain TXT as specified by SUNAT-PLE.
      *
-     * @param spreadsheet the spreadsheet object.
+     * @param spreadsheet the sheetName object.
      * @param target      the directory where files should be saved.
      * @throws Exception if implementation requires so.
      */

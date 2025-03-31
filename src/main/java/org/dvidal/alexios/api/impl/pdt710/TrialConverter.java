@@ -27,7 +27,7 @@ import java.util.function.Function;
 import static org.dvidal.alexios.google.GoogleUtils.intFromCell;
 
 /**
- * Converter to read data from a google spreadsheet row into
+ * Converter to read data from a google sheetName row into
  * a String as specified by SUNAT PDT710, Trial Balance.
  *
  * @implNote used reverse engenieering to know the data format since
