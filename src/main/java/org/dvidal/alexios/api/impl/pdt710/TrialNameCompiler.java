@@ -17,6 +17,8 @@
 
 package org.dvidal.alexios.api.impl.pdt710;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Supplier;
 
 /**
@@ -28,7 +30,7 @@ import java.util.function.Supplier;
 record TrialNameCompiler(PDTProcessor.PDTParams params) implements Supplier<String> {
 
     @Override
-    public String get() {
+    public @NotNull String get() {
         return "0710%s%s.txt".formatted(params.ruc(), params.year());
     }
 }

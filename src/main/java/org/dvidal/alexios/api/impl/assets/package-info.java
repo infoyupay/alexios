@@ -15,8 +15,9 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 /**
- * Package containing default implementations.
+ * Assets book implementation.
  *
+ * @author InfoYupay SACS
  * @version 1.0
  */
-package org.dvidal.alexios.api.impl;
+package org.dvidal.alexios.api.impl.assets;

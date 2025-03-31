@@ -1,5 +1,7 @@
 /**
  * This is the main explicit module of Alexios.
+ *
+ * @author InfoYupay SACS
  */
 module alexios.main {
     requires google.api.client;
@@ -9,6 +11,9 @@ module alexios.main {
     requires com.google.api.client.auth;
     requires com.google.api.client.extensions.java6.auth;
     requires com.google.api.client.extensions.jetty.auth;
-    requires google.api.services.sheets.v4.rev612;
-    requires google.api.services.drive.v3.rev197;
+    requires org.jetbrains.annotations;
+    requires com.google.api.services.sheets;
+    requires com.google.api.services.drive;
+
+    opens org.dvidal.alexios.api;
 }

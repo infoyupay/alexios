@@ -21,15 +21,16 @@ import org.dvidal.alexios.google.GoogleUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 
 class CostsProcessorTest {
-    static final String costID = "1BATs5M6b03iBhlCe33hkPKkxK71UCm8Itx3NxfZhamY";
+    static final String costID = "1Q1ykd6IKSTtqVDOaV19lYN6vWU1nUPS_2aQirg0-Kd8";
 
     @Test
     void testExport() throws Exception {
         var sheet = GoogleUtils.getSpreadsheet(costID);
-        var output = new File("testout", "LE100000");
-        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
+        var output = Path.of("/home/dvidal/Público/DIAR/2024/tm", "LE100000");
+        //if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
         new CostsProcessor().processSheet(sheet, output);
     }
 }

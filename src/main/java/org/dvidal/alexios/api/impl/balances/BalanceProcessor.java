@@ -18,25 +18,28 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.CellData;
-import com.google.api.services.sheets.v4.model.RowData;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import org.dvidal.alexios.api.BookProcessor;
 import org.dvidal.alexios.google.GoogleUtils;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-import static org.dvidal.alexios.google.GoogleUtils.ignoreBlank;
+import static org.dvidal.alexios.google.GoogleUtils.exportFile;
 import static org.dvidal.alexios.google.GoogleUtils.recreateFile;
 
+/**
+ * Implementation for LE030000 - Balances book.
+ * See PLE specification 030000.
+ *
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 public class BalanceProcessor implements BookProcessor {
     @Override
     public String title() {
@@ -44,90 +47,81 @@ public class BalanceProcessor implements BookProcessor {
     }
 
     @Override
-    public void processSheet(Spreadsheet spreadsheet, File target) throws Exception {
+    public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {
+        //Extract parameters from first worksheet.
         var params = new Params03(GoogleUtils.firstGridByName("030000", spreadsheet));
+        //Iterate through sheets.
         for (var s : spreadsheet.getSheets()) {
             switch (s.getProperties().getTitle()) {
                 case "030100" -> writeFinancial(s, params, "030100", target);
-                case "030200" -> writeFile(s,
+                case "030200" -> writeGenericFile(s,
                         params,
                         new LE0302Converter(params),
-                        ignoreBlank(),
                         4,
                         "030200",
                         target);
                 case "030300" -> writeReceivable(s, params, "030300", target);
                 case "030400" -> writeReceivable(s, params, "030400", target);
                 case "030500" -> writeReceivable(s, params, "030500", target);
-                case "030600" -> writeFile(s,
+                case "030600" -> writeGenericFile(s,
                         params,
                         new LE0306Converter(params),
-                        ignoreBlank(),
                         5,
                         "030600",
                         target);
-                case "030700" -> writeFile(s,
+                case "030700" -> writeGenericFile(s,
                         params,
                         new LE0307Converter(params),
-                        ignoreBlank(),
                         5,
                         "030700",
                         target);
-                case "030800" -> writeFile(s,
+                case "030800" -> writeGenericFile(s,
                         params,
                         new LE0308Converter(params),
-                        ignoreBlank(),
                         5,
                         "030800",
                         target);
-                case "030900" -> writeFile(s,
+                case "030900" -> writeGenericFile(s,
                         params,
                         new LE0309Converter(params),
-                        ignoreBlank(),
                         2,
                         "030900",
                         target);
-                case "031100" -> writeFile(s,
+                case "031100" -> writeGenericFile(s,
                         params,
                         new LE0311Converter(params),
-                        ignoreBlank(),
                         5,
                         "031100",
                         target);
-                case "031200" -> writeFile(s,
+                case "031200" -> writeGenericFile(s,
                         params,
                         new LE0312Converter(params),
-                        ignoreBlank(),
                         5,
                         "031200",
                         target);
-                case "031300" -> writeFile(s,
+                case "031300" -> writeGenericFile(s,
                         params,
                         new LE0313Converter(params),
-                        ignoreBlank(),
                         5,
                         "031300",
                         target);
-                case "031400" -> recreateFile(new File(target, params.compileFile("031400", false)));
-                case "031500" -> writeFile(s,
+                case "031400" -> recreateFile(target.resolve(params.compileFile("031400", false)));
+                case "031500" -> writeGenericFile(s,
                         params,
                         new LE0315Converter(params),
-                        ignoreBlank(),
                         4,
                         "031500",
                         target);
                 case "031601" -> new LE031601Processor(params, target, s).call();
-                case "031602" -> writeFile(s,
+                case "031602" -> writeGenericFile(s,
                         params,
                         new LE031602Converter(params),
-                        ignoreBlank(),
                         5,
                         "031602",
                         target);
-                case "031700" -> writeFile(s,
+                case "031700" -> writeGenericFile(s,
                         params,
                         new LE031700Converter(params),
-                        ignoreBlank(),
                         3,
                         "031700",
                         target);
@@ -141,64 +135,112 @@ public class BalanceProcessor implements BookProcessor {
         }
     }
 
+    /**
+     * Writes the financial reports. The balances book contains the following financial reports:
+     * <ul>
+     *     <li><b>0301:</b> Financial statements (balance sheet).</li>
+     *     <li><b>0318:</b> Cash flow - direct method.</li>
+     *     <li><b>0319:</b> Equity changes.</li>
+     *     <li><b>0320:</b> Income statement.</li>
+     *     <li><b>0324:</b> Comprehensive income statement.</li>
+     *     <li><b>0325:</b> Cash flow - indirect method.</li>
+     * </ul>
+     *
+     * @param aSheet worksheet object.
+     * @param params parameters to perform exportation.
+     * @param bookID the ID of the book.
+     * @param target the target path (folder).
+     * @throws IOException if unable to write file.
+     */
     private void writeFinancial(Sheet aSheet,
                                 Params03 params,
                                 String bookID,
-                                File target) throws IOException {
+                                Path target) throws IOException {
         //With default converter.
         writeFinancial(aSheet, params, new FinancialConverter(params), bookID, target);
     }
 
+    /**
+     * The {@link #writeFinancial(Sheet, Params03, String, Path)} relies upon this implementation
+     * to perform its duties. It's necessary because the financial report LE031900 (Equity changes)
+     * requires further customization which is achieved by {@link LE031900Converter}. So, in order
+     * to be able to use said customization, this method becomes necessary. All other use cases
+     * shall use the {@link FinancialConverter} default function.
+     *
+     * @param aSheet    worksheet object.
+     * @param params    parameters to export.
+     * @param converter the converter to format cell data into SUNAT-PLE format.
+     * @param bookID    the electronic book ID.
+     * @param target    output path (directory).
+     * @throws IOException if unable to write in output path.
+     */
     private void writeFinancial(Sheet aSheet,
-                                Params03 params,
+                                @NotNull Params03 params,
                                 Function<List<CellData>, String> converter,
                                 String bookID,
-                                File target) throws IOException {
-        writeFile(aSheet,
-                params,
-                //Provided converter for financial reports.
+                                Path target) throws IOException {
+        var info = GoogleUtils.infoFlag(aSheet);
+        exportFile(
+                aSheet,
+                2,
+                params.compileFile(bookID, info),
+                target,
                 converter,
                 //Filter rows without entry ID.
                 rw -> rw.size() > 2
                         && Optional.ofNullable(rw.get(2))
                         .map(CellData::getFormattedValue)
                         .filter(x -> !x.isBlank())
-                        .isPresent(),
-                //All financial reports has 2 header rows at this verison. (May change in future).
-                2,
-                bookID,
-                target);
+                        .isPresent());
     }
 
-    public void writeReceivable(Sheet aSheet, Params03 params, String bookID, File target) throws IOException {
-        writeFile(aSheet, params, new ReceivableConverter(params), ignoreBlank(), 5, bookID, target);
+    /**
+     * Inner method to write receivable statements. Receivable statements conatins the same structure, so
+     * one single converter may be reused.
+     *
+     * @param aSheet worsheet object.
+     * @param params parameters for the exportation process.
+     * @param bookID PLE book ID.
+     * @param target the target output directory.
+     * @throws IOException if unable to write to target.
+     */
+    private void writeReceivable(Sheet aSheet,
+                                 @NotNull Params03 params,
+                                 String bookID,
+                                 Path target) throws IOException {
+        var info = GoogleUtils.infoFlag(aSheet);
+        exportFile(
+                aSheet,
+                5,
+                params.compileFile(bookID, info),
+                target,
+                new ReceivableConverter(params));
     }
 
-    private void writeFile(Sheet aSheet,
-                           Params03 params,
-                           Function<List<CellData>, String> converter,
-                           Predicate<List<CellData>> filter,
-                           long header,
-                           String bookID,
-                           File target) throws IOException {
+    /**
+     * Inner method where the writing is handled to allow better customization.
+     *
+     * @param aSheet    the worksheet object.
+     * @param params    parameters for exportation.
+     * @param converter the converter to format values.
+     * @param header    the header lines to skip.
+     * @param bookID    the ID of the book.
+     * @param target    the target output folder.
+     * @throws IOException if unable to create/write new file.
+     */
+    private void writeGenericFile(Sheet aSheet,
+                                  @NotNull Params03 params,
+                                  Function<List<CellData>, String> converter,
+                                  long header,
+                                  String bookID,
+                                  @NotNull Path target) throws IOException {
         //Check info flag
         var info = readInfoFlag(aSheet);
-        //Compile file name
-        var output = new File(target, params.compileFile(bookID, info));
-        //Recreate the file (check if exists to delete, then touch).
-        recreateFile(output);
-        //Open file to write in UTF-8.
-        try (var fos = new FileOutputStream(output);
-             var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
-            //Convert and print.
-            aSheet.getData().get(0).getRowData()
-                    .stream()
-                    .skip(header)
-                    .map(RowData::getValues)
-                    .filter(filter)
-                    .map(converter)
-                    .forEach(ps::print);
-        }//Close file (autoclose).
-        //END!
+        exportFile(
+                aSheet,
+                header,
+                params.compileFile(bookID, info),
+                target,
+                converter);
     }
 }

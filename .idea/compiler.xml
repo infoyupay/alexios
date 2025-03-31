@@ -13,6 +13,6 @@
       <entry name="!?*.aj" />
       <entry name="!?*.json" />
     </wildcardResourcePatterns>
-    <bytecodeTargetLevel target="15" />
+    <bytecodeTargetLevel target="23" />
   </component>
 </project>

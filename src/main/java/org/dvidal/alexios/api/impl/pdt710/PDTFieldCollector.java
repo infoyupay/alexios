@@ -17,6 +17,10 @@
 
 package org.dvidal.alexios.api.impl.pdt710;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,19 +51,21 @@ record PDTFieldCollector(BigDecimal uitLimit,
      *
      * @return the PDTField object.
      */
-    static PDTField identity() {
+    static @NotNull PDTField identity() {
         var r = new PDTField();
         r.doiType = "99";
         return r;
     }
 
+    @Contract(pure = true)
     @Override
-    public Supplier<ArrayList<PDTField>> supplier() {
+    public @NotNull Supplier<ArrayList<PDTField>> supplier() {
         return ArrayList::new;
     }
 
+    @Contract(pure = true)
     @Override
-    public BiConsumer<ArrayList<PDTField>, PDTField> accumulator() {
+    public @NotNull BiConsumer<ArrayList<PDTField>, PDTField> accumulator() {
         return this::accumulate;
     }
 
@@ -71,14 +77,15 @@ record PDTFieldCollector(BigDecimal uitLimit,
      * @param list the list where result should be put.
      * @param item the item to add into list.
      */
-    private void accumulate(ArrayList<PDTField> list, PDTField item) {
+    private void accumulate(@NotNull ArrayList<PDTField> list, PDTField item) {
         var ix = list.indexOf(item);
         if (ix < 0) list.add(item);
         else list.get(ix).sumAmount(item.toAmount());
     }
 
+    @Contract(pure = true)
     @Override
-    public BinaryOperator<ArrayList<PDTField>> combiner() {
+    public @NotNull BinaryOperator<ArrayList<PDTField>> combiner() {
         return (a, b) -> {
             //Use the accumulation function on each element of b.
             b.forEach(i -> accumulate(a, i));
@@ -86,8 +93,9 @@ record PDTFieldCollector(BigDecimal uitLimit,
         };
     }
 
+    @Contract(pure = true)
     @Override
-    public Function<ArrayList<PDTField>, List<PDTField>> finisher() {
+    public @NotNull Function<ArrayList<PDTField>, List<PDTField>> finisher() {
         return ls -> {
             //This counter will increment with each item less than UIT threshold.
             var count = new Counter();
@@ -121,8 +129,9 @@ record PDTFieldCollector(BigDecimal uitLimit,
         else return item.amount.compareTo(uitLimit) < 0;
     }
 
+    @Contract(value = " -> new", pure = true)
     @Override
-    public Set<Characteristics> characteristics() {
+    public @NotNull @Unmodifiable Set<Characteristics> characteristics() {
         return Set.of(Characteristics.UNORDERED);
     }
 

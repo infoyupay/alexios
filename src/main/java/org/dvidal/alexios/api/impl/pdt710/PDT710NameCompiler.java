@@ -17,6 +17,9 @@
 
 package org.dvidal.alexios.api.impl.pdt710;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Supplier;
 
 /**
@@ -29,8 +32,9 @@ import java.util.function.Supplier;
  * @version 1.0
  */
 record PDT710NameCompiler(String year, String ruc, int field) implements Supplier<String> {
+    @Contract(pure = true)
     @Override
-    public String get() {
+    public @NotNull String get() {
         return "0710%s%s%03d.txt".formatted(year, ruc, field);
     }
 }

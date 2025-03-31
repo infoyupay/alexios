@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -25,9 +26,19 @@ import java.util.function.Function;
 
 import static org.dvidal.alexios.google.GoogleUtils.decimalText;
 
+/**
+ * Function to convert a row of CellData into a SUNAT-PLE txt tuple for
+ * LE031900 - Statement of changes in net worth.
+ * <br/>
+ * It shall add \r\n at the end of line.
+ *
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 record LE031900Converter(Params03 params) implements Function<List<CellData>, String> {
+
     @Override
-    public String apply(List<CellData> cellData) {
+    public String apply(@NotNull List<CellData> cellData) {
         return new StringJoiner("|")
                 .add(params.periodID())//1
                 .add("09")//2

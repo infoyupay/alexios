@@ -18,6 +18,8 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.GridData;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import static org.dvidal.alexios.google.GoogleUtils.stringAt;
 
@@ -54,15 +56,38 @@ record Params03(String ruc,
         );
     }
 
-    public String periodID() {
+    /**
+     * Constructs the period ID out of {@link #year}, {@link #month} and {@link #day} params.
+     *
+     * @return the period ID which is yyyyMMdd
+     */
+    @Contract(pure = true)
+    public @NotNull String periodID() {
         return "%s%s%s".formatted(year, month, day);
     }
 
-    public String compileFile(String bookID, boolean info) {
+    /**
+     * Compiles the file name taking into account these parameters.
+     *
+     * @param bookID the book ID.
+     * @param info   information flag.
+     * @return file name.
+     */
+    @Contract(pure = true)
+    public @NotNull String compileFile(String bookID, boolean info) {
         return compileFile(bookID, info, "txt");
     }
 
-    public String compileFile(String bookID, boolean info, String extension) {
+    /**
+     * Compiles the file name taking into account these parameters.
+     *
+     * @param bookID    the book ID.
+     * @param info      information flag.
+     * @param extension the extension at the end of file.
+     * @return file name.
+     */
+    @Contract(pure = true)
+    public @NotNull String compileFile(String bookID, boolean info, String extension) {
         return "LE%s%s%s%s%s%s%s%s11.%s".formatted(
                 ruc,
                 year,

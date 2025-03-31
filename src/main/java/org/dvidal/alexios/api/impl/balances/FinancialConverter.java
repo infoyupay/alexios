@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -32,7 +33,7 @@ import static org.dvidal.alexios.google.GoogleUtils.decimalText;
  */
 record FinancialConverter(Params03 params) implements Function<List<CellData>, String> {
     @Override
-    public String apply(List<CellData> cellData) {
+    public String apply(@NotNull List<CellData> cellData) {
         return new StringJoiner("|")
                 .add(params.periodID())//1
                 .add("01")//2

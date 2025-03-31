@@ -18,5 +18,6 @@
  * This package contains the public API of the app.
  *
  * @version 1.0
+ * @author InfoYupay SACS
  */
 package org.dvidal.alexios.api;

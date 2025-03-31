@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +28,7 @@ import java.util.function.Function;
  * Inner implementation of function to convert a row in the form
  * of a {@code List<CellData>} into a String for a PLE tuple
  * as specified by book 100400.
+ * It shall add \r\n at the end of line.
  *
  * @version 1.0
  */
@@ -51,7 +53,7 @@ final class LE1004Converter implements Function<List<CellData>, String> {
     }
 
     @Override
-    public String apply(List<CellData> cellData) {
+    public @NotNull String apply(@NotNull List<CellData> cellData) {
         var line = new String[8];
         line[0] = year;
         line[1] = "%024d".formatted(correlative.incrementAndGet());

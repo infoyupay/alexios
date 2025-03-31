@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.pdt710;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -26,16 +27,16 @@ import java.util.function.Function;
 import static org.dvidal.alexios.google.GoogleUtils.intFromCell;
 
 /**
- * Processor to read data from a google spreadsheet row into
+ * Converter to read data from a google spreadsheet row into
  * a String as specified by SUNAT PDT710, Trial Balance.
  *
  * @implNote used reverse engenieering to know the data format since
  * a specification was not provided, but a helper excel file with macros
  * gave hints on the structure and file naming.
  */
-final class TrialProcessor implements Function<List<CellData>, String> {
+final class TrialConverter implements Function<List<CellData>, String> {
     @Override
-    public String apply(List<CellData> cellData) {
+    public String apply(@NotNull List<CellData> cellData) {
         return new StringJoiner("|")
                 .add(cellData.get(0).getFormattedValue())
                 .add("%d".formatted(intFromCell(cellData.get(2))))

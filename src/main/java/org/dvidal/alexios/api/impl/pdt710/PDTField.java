@@ -17,6 +17,9 @@
 
 package org.dvidal.alexios.api.impl.pdt710;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -72,7 +75,8 @@ final class PDTField {
         return this;
     }
 
-    public PDTField reduceAmount(PDTField another) {
+    @Contract(mutates = "this")
+    public PDTField reduceAmount(@NotNull PDTField another) {
         return sumAmount(another.amount);
     }
 
@@ -82,7 +86,8 @@ final class PDTField {
      *
      * @param pleID the pleID.
      */
-    void parseDoiType(String pleID) {
+    @Contract(mutates = "this")
+    void parseDoiType(@NotNull String pleID) {
 
         doiType = switch (pleID) {
             case "1" -> "01";
@@ -108,7 +113,12 @@ final class PDTField {
                 .toString();
     }
 
-     BigDecimal toAmount() {
+    /**
+     * Accessor to the amount.
+     *
+     * @return the amount.
+     */
+    BigDecimal toAmount() {
         return amount;
     }
 

@@ -32,10 +32,14 @@ import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -52,6 +56,9 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class GoogleUtils {
+    /**
+     * Decimal format symbols for PLE specs.
+     */
     public static final DecimalFormatSymbols PLE_SYM = new DecimalFormatSymbols() {
 
         @Override
@@ -64,7 +71,13 @@ public class GoogleUtils {
             return '.';
         }
     };
+    /**
+     * General decimal format for PLE specs.
+     */
     public static final DecimalFormat PLE_FMT = new DecimalFormat("###0.00", PLE_SYM);
+    /**
+     * Decimal format to use in LE 1602, field 7 specs.
+     */
     public static final DecimalFormat PLE_1602_7_FMT = new DecimalFormat("###0.00000000", PLE_SYM);
     /**
      * The application name, which is alexios.
@@ -79,7 +92,11 @@ public class GoogleUtils {
      */
     public static final String TOKENS_PATH = "tokens";
     /**
-     * A singleton scope to read spreadsheets.
+     * A scope to read spreadsheets with the following scopes:
+     * <ol>
+     *     <li>{@link SheetsScopes#SPREADSHEETS_READONLY}</li>
+     *     <li>{@link SheetsScopes#DRIVE_READONLY}</li>
+     * </ol>
      */
     public static final List<String> SCOPES = List.of(SheetsScopes.SPREADSHEETS_READONLY, DriveScopes.DRIVE_READONLY);
     /**
@@ -105,6 +122,7 @@ public class GoogleUtils {
 
     /**
      * Utility method to create credentials for Google API.
+     * It shall use {@link #getCredentials(NetHttpTransport, List)} with the scopes {@link #SCOPES}
      *
      * @param transport the GoogleAuthorizationCodeFlow http transport.
      * @return a credential to use in the app.
@@ -114,6 +132,14 @@ public class GoogleUtils {
         return getCredentials(transport, SCOPES);
     }
 
+    /**
+     * Utility method to create credentials for Google API.
+     *
+     * @param transport the GoogleAuthorizationCodeFlow http transport.
+     * @param scopes    the scopes for the credential.
+     * @return a credential to use in the app.
+     * @throws IOException if the credentials resources cannot be loaded.
+     */
     public static Credential getCredentials(final NetHttpTransport transport, final List<String> scopes) throws IOException {
         var is = GoogleUtils.class.getResourceAsStream(CREDENTIALS_PATH);
         if (is == null)
@@ -147,13 +173,21 @@ public class GoogleUtils {
         return service.spreadsheets().get(spreadSheetID).setIncludeGridData(true).execute();
     }
 
-    public static void downloadDriveFile(final String driveID, final File target) throws IOException, GeneralSecurityException {
+    /**
+     * Downloads a google drive file by ID into a target path.
+     *
+     * @param driveID the google drive ID.
+     * @param target  the target path.
+     * @throws IOException              if cannot write.
+     * @throws GeneralSecurityException if security manager throws it.
+     */
+    public static void downloadDriveFile(final String driveID, final Path target) throws IOException, GeneralSecurityException {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
         final var service = new Drive.Builder(transport, JSON_FACTORY, getCredentialsDrive(transport))
                 .setApplicationName(APP_NAME)
                 .build();
 
-        try (var fos = new FileOutputStream(target)) {
+        try (var fos = Files.newOutputStream(target)) {
             service.files().get(driveID).executeMediaAndDownloadTo(fos);
         }
     }
@@ -164,9 +198,10 @@ public class GoogleUtils {
      * @param cell a given cell.
      * @return a double value from cell, or 0.0 if null.
      */
-    public static double doubleFromCell(CellData cell) {
-        var r = cell.getEffectiveValue().getNumberValue();
-        return r == null ? 0.0 : r;
+    public static double doubleFromCell(@NotNull CellData cell) {
+        return Optional.ofNullable(cell.getEffectiveValue())
+                .map(ExtendedValue::getNumberValue)
+                .orElse(0D);
     }
 
     /**
@@ -175,7 +210,7 @@ public class GoogleUtils {
      * @param cell a given cell.
      * @return an int value from cell, or 09 if null.
      */
-    public static int intFromCell(CellData cell) {
+    public static int intFromCell(@NotNull CellData cell) {
         return Optional.ofNullable(cell.getEffectiveValue())
                 .map(ExtendedValue::getNumberValue)
                 .map(Double::intValue)
@@ -200,12 +235,27 @@ public class GoogleUtils {
                 .orElse("0.00");
     }
 
+    /**
+     * Convenient method to format decimals for LE1602, field 7 specs.
+     * Extracts data from a CellData object representing a cell, if it contains decimal data,
+     * will format using the {@link #PLE_1602_7_FMT} decimal format.
+     *
+     * @param cell the cell object.
+     * @return formatted decimal value, if no value is present "0.00000000"
+     */
     public static String decimalText1602(CellData cell) {
         return decimalIn(cell)
                 .map(PLE_1602_7_FMT::format)
                 .orElse("0.00000000");
     }
 
+    /**
+     * Convenient method to extract a BigDecimal value from a cell object.
+     *
+     * @param cell the cell object.
+     * @return an optional containing the number value of the cell object,
+     * converted to BigDecimal, if no number value is found it'll be empty.
+     */
     public static Optional<BigDecimal> decimalIn(CellData cell) {
         return Optional.ofNullable(cell)
                 .map(CellData::getEffectiveValue)
@@ -220,7 +270,7 @@ public class GoogleUtils {
      * @param cell the given cell.
      * @return a date as string in format dd/MM/uuuu
      */
-    public static String fromDateCell(CellData cell) {
+    public static @NotNull String fromDateCell(@NotNull CellData cell) {
         var dt = cell.getFormattedValue();
         if (dt == null || dt.isBlank()) {
             return "00/00/0000";
@@ -235,10 +285,11 @@ public class GoogleUtils {
      *
      * @return a useful predicate.
      */
-    public static Predicate<List<CellData>> ignoreBlank() {
+    @Contract(pure = true)
+    public static @NotNull Predicate<List<CellData>> ignoreBlank() {
         return ls -> {
             if (ls == null || ls.isEmpty()) return false;
-            var cell = ls.get(0);
+            var cell = ls.getFirst();
             if (cell == null) return false;
             var txt = cell.getFormattedValue();
             return !(txt == null || txt.isBlank());
@@ -308,29 +359,31 @@ public class GoogleUtils {
      * @param fileName   the file name where to write.
      * @param path       the output directory path (parent of target file).
      * @param converter  The converter to extract PLE tuples from a worksheet.
+     * @param rowFilter  a filter to ignore rows that doesn't pass validation.
      * @throws IOException if output fails.
      */
-    @SuppressWarnings("ResultOfMethodCallIgnored")
     public static void exportFile(Sheet worksheet,
                                   long skipHeader,
                                   String fileName,
-                                  File path,
-                                  Function<List<CellData>, String> converter) throws IOException {
-        if (!path.exists()) path.mkdirs();
-        var output = new File(path, fileName);
+                                  @NotNull Path path,
+                                  Function<List<CellData>, String> converter,
+                                  @NotNull Predicate<List<CellData>> rowFilter) throws IOException {
+        //If the target output folder doesn't exist, create.
+        if (!Files.exists(path)) Files.createDirectories(path);
+        //Resolve file name within path.
+        var output = path.resolve(fileName);
+        //Clean the file.
         recreateFile(output);
         //Check info flag
-        if (fileName.charAt(30) == '0') {
-            output.createNewFile();
-        } else {
+        if (fileName.charAt(30) != '0') {
             //Exports using the provided converter.
-            try (var fos = new FileOutputStream(output, false);
-                 var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
-                worksheet.getData().get(0).getRowData()
+            try (var os = Files.newOutputStream(output);
+                 var ps = new PrintStream(os, true, StandardCharsets.UTF_8)) {
+                worksheet.getData().getFirst().getRowData()
                         .stream()
                         .skip(skipHeader)
                         .map(RowData::getValues)
-                        .filter(ignoreBlank())
+                        .filter(rowFilter)
                         .map(converter)
                         .forEachOrdered(ps::print);
             }
@@ -338,14 +391,23 @@ public class GoogleUtils {
     }
 
     /**
-     * Utility method to check if a file exists and delete.
-     * The, even if file didn't exist, will "touch" (create) it.
+     * Utility method to write the data from a worksheet and mapped
+     * to PLE tuples, into a plain txt file. This is the default, which
+     * ignores blank rows using {@link #ignoreBlank()} filter.
      *
-     * @param aFile the file to check.
-     * @throws IOException if cannot delete or create.
+     * @param worksheet  the worksheet.
+     * @param skipHeader the header rows count to skip.
+     * @param fileName   the file name where to write.
+     * @param path       the output directory path (parent of target file).
+     * @param converter  The converter to extract PLE tuples from a worksheet.
+     * @throws IOException if output fails.
      */
-    public static void recreateFile(File aFile) throws IOException {
-        recreateFileIf(aFile, true);
+    public static void exportFile(Sheet worksheet,
+                                  long skipHeader,
+                                  String fileName,
+                                  @NotNull Path path,
+                                  Function<List<CellData>, String> converter) throws IOException {
+        exportFile(worksheet, skipHeader, fileName, path, converter, ignoreBlank());
     }
 
     /**
@@ -353,14 +415,11 @@ public class GoogleUtils {
      * The, even if file didn't exist, will "touch" (create) it.
      *
      * @param aFile the file to check.
-     * @param flag  flag to state if should recreate or not.
      * @throws IOException if cannot delete or create.
      */
-    public static void recreateFileIf(File aFile, boolean flag) throws IOException {
-        if (aFile.exists() && !aFile.delete())
-            throw new IOException("File already exists but cannot be deleted: " + aFile);
-        if (flag && !aFile.createNewFile())
-            throw new IOException("Cannot touch file: " + aFile);
+    public static void recreateFile(Path aFile) throws IOException {
+        Files.write(aFile, new byte[0]);
+        //TODO: TEST IT!
     }
 
     /**
@@ -369,52 +428,101 @@ public class GoogleUtils {
      * @param worksheet the worksheet.
      * @return true if A1 is true.
      */
-    public static boolean infoFlag(Sheet worksheet) {
+    public static boolean infoFlag(@NotNull Sheet worksheet) {
         return worksheet.getData()
-                .get(0)
+                .getFirst()
                 .getRowData()
                 .stream()
                 .map(RowData::getValues)
                 .filter(r -> !r.isEmpty())
-                .map(r -> r.get(0))
+                .map(List::getFirst)
                 .map(CellData::getEffectiveValue)
                 .map(ExtendedValue::getBoolValue)
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find A1 cell in worksheet."));
     }
 
+    /**
+     * Get the first grid (sheet) object with given name in the spreadsheet.
+     *
+     * @param sheet       the required sheet name.
+     * @param spreadsheet the spreadsheet object.
+     * @return the grid data of given sheet name.
+     * @throws IllegalArgumentException if there's no sheet with given sheet name.
+     */
     public static GridData firstGridByName(String sheet, Spreadsheet spreadsheet) {
         return firstGridAs(sheet, spreadsheet)
                 .orElseThrow(() -> noSheet(sheet));
     }
 
+    /**
+     * Get the first grid (sheet) object with given name in the spreadsheet as an Optional.
+     *
+     * @param sheet       the required sheet name.
+     * @param spreadsheet the spreadsheet object.
+     * @return the grid data of given sheet name.
+     * @throws IllegalArgumentException if there's no sheet with given sheet name.
+     */
     public static Optional<GridData> firstGridAs(String sheet, Spreadsheet spreadsheet) {
         return firstSheetAs(sheet, spreadsheet)
                 .map(Sheet::getData)
-                .map(l -> l.get(0));
+                .map(List::getFirst);
     }
 
-    public static Optional<Sheet> firstSheetAs(String sheet, Spreadsheet spreadsheet) {
+    /**
+     * Get the first sheet object with given name as a worksheet Optional.
+     *
+     * @param sheet       the required name.
+     * @param spreadsheet the spreadsheet object.
+     * @return an optional with required sheet.
+     */
+    public static @NotNull Optional<Sheet> firstSheetAs(String sheet, @NotNull Spreadsheet spreadsheet) {
         return spreadsheet.getSheets().stream()
                 .filter(s -> Objects.equals(sheet, s.getProperties().getTitle()))
                 .findFirst();
     }
 
+    /**
+     * Get the first sheet object with given name as a worksheet.
+     *
+     * @param sheet       the required name.
+     * @param spreadsheet the spreadsheet object.
+     * @return an optional with required sheet.
+     * @throws IllegalArgumentException if no sheet with given name is found.
+     */
     public static Sheet firstSheetByName(String sheet, Spreadsheet spreadsheet) {
         return firstSheetAs(sheet, spreadsheet)
                 .orElseThrow(() -> noSheet(sheet));
     }
 
-    public static String stringAt(GridData data, int row, int column) {
+    /**
+     * Extracts the formatted value from a given cell (by coordinates).
+     *
+     * @param data   the grid of data.
+     * @param row    the row index.
+     * @param column the column index.
+     * @return the required value as formattedValue, or "" if no value is found.
+     */
+    @Contract("_, _, _ -> !null")
+    public static String stringAt(@NotNull GridData data, int row, int column) {
         return Optional.ofNullable(data.getRowData())
                 .map(r -> r.get(row))
                 .map(RowData::getValues)
                 .map(l -> l.get(column))
                 .map(CellData::getFormattedValue)
-                .orElseThrow(() -> noCell(row, column));
+                .orElse("");
     }
 
-    public static BigDecimal decimalAt(GridData data, int row, int column) {
+    /**
+     * Extracts the number value from a cell (by coordinates)
+     * and returns it as a BigDecimal object.
+     *
+     * @param data   the grid of data.
+     * @param row    the cell row index.
+     * @param column the cell column index.
+     * @return the bigdecimal from the cell value, or {@link BigDecimal#ZERO} if no value is found.
+     */
+    public static BigDecimal decimalAt(@NotNull GridData data, int row, int column) {
         return Optional.ofNullable(data.getRowData())
                 .map(r -> r.get(row))
                 .map(RowData::getValues)
@@ -425,6 +533,12 @@ public class GoogleUtils {
                 .orElse(BigDecimal.ZERO);
     }
 
+    /**
+     * Extracts the formatted value of a cell as a numeric text copying only digits.
+     *
+     * @param cell the cell object.
+     * @return only digits String value.
+     */
     public static String numericText(CellData cell) {
         return Optional.ofNullable(cell)
                 .map(CellData::getFormattedValue)
@@ -434,7 +548,16 @@ public class GoogleUtils {
                 .collect(Collectors.joining());
     }
 
-    public static String safeText(List<CellData> data, int column) {
+    /**
+     * Extracts text from the formatted value of a cell, and makes the value safe
+     * for further operations replacing / by -
+     *
+     * @param data   the data row.
+     * @param column the column index.
+     * @return the safe text value or - if no value is found.
+     */
+    @Contract("_, _ -> !null")
+    public static String safeText(@NotNull List<CellData> data, int column) {
         return data
                 .stream()
                 .skip(column)
@@ -444,12 +567,15 @@ public class GoogleUtils {
                 .orElse("-");
     }
 
-    public static IllegalArgumentException noCell(int row, int column) {
-        return new IllegalArgumentException("Cannot find cell at row %d; column %d."
-                .formatted(row, column));
-    }
-
-    public static IllegalArgumentException noSheet(String sheetName) {
+    /**
+     * Convenient method to create IllegalArgumentExcpetion objects to throw
+     * when searching for a sheet with a given name but not finding it.
+     *
+     * @param sheetName the not found sheet name.
+     * @return a ready to throw exception.
+     */
+    @Contract("_ -> new")
+    public static @NotNull IllegalArgumentException noSheet(String sheetName) {
         return new IllegalArgumentException("Cannot find sheet with name: " + sheetName);
     }
 }

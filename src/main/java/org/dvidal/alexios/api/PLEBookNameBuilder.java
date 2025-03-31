@@ -17,9 +17,13 @@
 
 package org.dvidal.alexios.api;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Builder to easily create the PLE file name.
  *
+ * @author InfoYupay SACS
  * @version 1.0
  */
 public class PLEBookNameBuilder {
@@ -173,7 +177,8 @@ public class PLEBookNameBuilder {
      *
      * @return the output file name.
      */
-    public final String build() {
+    @Contract(pure = true)
+    public final @NotNull String build() {
         return "LE" +
                 ruc +
                 year +

@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.pdt710;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -30,11 +31,12 @@ import java.util.function.BiConsumer;
  * name (A business name). Finally, sets the PDTField name properties
  * in consequence.
  *
+ * @param index column index where to find names.
  * @version 1.0
  */
 record NamesProcessor(int index) implements BiConsumer<List<CellData>, PDTField> {
     @Override
-    public void accept(List<CellData> cellData, PDTField pdtField) {
+    public void accept(List<CellData> cellData, @NotNull PDTField pdtField) {
         if ((pdtField.doiType.equals("06") && pdtField.doiNum.startsWith("20"))
                 || pdtField.doiType.equals("00")) {
             pdtField.inputFlag = "0";
@@ -47,7 +49,7 @@ record NamesProcessor(int index) implements BiConsumer<List<CellData>, PDTField>
                 pdtField.name = nameParts[1];
                 var lastParts = nameParts[0].split(" ", 2);
                 pdtField.lastName1 = lastParts[0];
-                if (lastParts.length ==2) pdtField.lastName2 = lastParts[1];
+                if (lastParts.length == 2) pdtField.lastName2 = lastParts[1];
             } else {
                 var spacedParts = nameFull.split(" ", 3);
                 switch (spacedParts.length) {

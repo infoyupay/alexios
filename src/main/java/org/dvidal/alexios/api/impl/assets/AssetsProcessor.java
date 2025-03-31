@@ -15,19 +15,15 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.dvidal.alexios.api.impl;
+package org.dvidal.alexios.api.impl.assets;
 
 import com.google.api.services.sheets.v4.model.CellData;
-import com.google.api.services.sheets.v4.model.RowData;
-import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import org.dvidal.alexios.api.BookProcessor;
 import org.dvidal.alexios.api.PLEBookNameBuilder;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -37,8 +33,10 @@ import java.util.function.Function;
 import static org.dvidal.alexios.google.GoogleUtils.*;
 
 /**
- * Default implementation for LE070000 book.
+ * Implementation for LE070000 - Assets book.
+ * See PLE specification 070000.
  *
+ * @author InfoYupay SACS
  * @version 1.0
  */
 public class AssetsProcessor implements BookProcessor {
@@ -46,7 +44,6 @@ public class AssetsProcessor implements BookProcessor {
     private String year;
     private String period;
     private String opsFlag;
-    private File target;
 
     @Override
     public String title() {
@@ -54,24 +51,48 @@ public class AssetsProcessor implements BookProcessor {
     }
 
     @Override
-    public void processSheet(Spreadsheet spreadsheet, File target) throws Exception {
-        this.target = target;
+    public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {
+        //Retrieve parameters from the 070000 spreadsheet.
         retrieveParameters(spreadsheet);
+        //Iterate thru spreadsheets.
         for (var worksheet : spreadsheet.getSheets()) {
+            //Check information flag (A1).
+            var infoFlag = readInfoFlag(worksheet);
+            //Check worksheet name.
             switch (worksheet.getProperties().getTitle()) {
-                case "070100" -> exportFile(worksheet, "070100", 4, new LE0701Converter());
-                case "070300" -> exportFile(worksheet, "070300", 3, new LE0703Converter());
-                case "070400" -> exportFile(worksheet, "070400", 3, new LE0704Converter());
+                //0701 book: Fixed assets.
+                case "070100" -> exportFile(worksheet, 4,
+                        buildFnam("070100", infoFlag),
+                        target,
+                        new LE0701Converter());
+                //0703 book: exchange rate difference.
+                case "070300" -> exportFile(worksheet, 3,
+                        buildFnam("070300", infoFlag),
+                        target,
+                        new LE0703Converter());
+                //0704 book: leased assets.
+                case "070400" -> exportFile(worksheet, 3,
+                        buildFnam("070400", infoFlag),
+                        target,
+                        new LE0704Converter());
             }
         }
     }
 
-    private void retrieveParameters(Spreadsheet spreadsheet) throws IllegalArgumentException {
+    /**
+     * Inner method to extract book parameters.
+     * In the first sheet named 070000 of the workbook shall be ruc, year, period and opsFlag parameters.
+     *
+     * @param spreadsheet the spreadsheet object.
+     * @throws IllegalArgumentException if there's no "070000" sheet.
+     */
+    private void retrieveParameters(@NotNull Spreadsheet spreadsheet)
+            throws IllegalArgumentException {
         var ss = spreadsheet.getSheets().stream()
                 .filter(x -> Objects.equals(x.getProperties().getTitle(), "070000"))
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find worksheet 070000."));
-        var rows = ss.getData().get(0).getRowData();
+        var rows = ss.getData().getFirst().getRowData();
         ruc = rows.get(4).getValues().get(1).getFormattedValue();
         year = rows.get(5).getValues().get(1).getFormattedValue();
         period = year + "0000";
@@ -85,7 +106,7 @@ public class AssetsProcessor implements BookProcessor {
      * @param infoFlag the flag of information (true= with information, false= empty).
      * @return an output file name.
      */
-    private String buildFnam(String bookID, boolean infoFlag) {
+    private @NotNull String buildFnam(String bookID, boolean infoFlag) {
         return new PLEBookNameBuilder()
                 .withBookID(bookID)
                 .withEmpty(infoFlag)
@@ -97,47 +118,37 @@ public class AssetsProcessor implements BookProcessor {
 
     }
 
-    private void exportFile(Sheet worksheet,
-                            String bookID,
-                            long skipHeader,
-                            Function<List<CellData>, String> converter)
-            throws Exception {
-        //1. Check if should create empty file.
-        var infoFlag = readInfoFlag(worksheet);
-
-        var fnam = buildFnam(bookID, infoFlag);
-        var output = new File(target, fnam);
-        recreateFile(output);
-
-        //If book is empty, leave method.
-        if (!infoFlag) {
-            return;
-        }
-
-        //If book contains data, proceed.
-        try (var fos = new FileOutputStream(output, false);
-             var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
-            worksheet.getData().get(0).getRowData()
-                    .stream()
-                    .skip(skipHeader)
-                    .map(RowData::getValues)
-                    .filter(ignoreBlank())
-                    .map(converter)
-                    .forEachOrdered(ps::print);
-        }
-    }
-
-    private void fillPrimaryKey(String[] line, AtomicLong correlative) {
+    /**
+     * Inner method to fill primary keys values. According to PLE specs, the first 3 fields are
+     * primary key fields, composed by:
+     * <li>
+     *     <ul><b>0 - Period:</b> taxation period.</ul>
+     *     <ul><b>1 - ID:</b> ID for the op. Since we are not generating from database, a random UUID is set.</ul>
+     *     <ul><b>2 - Correlative:</b> Correlative number in format M000000000</ul>
+     * </li>
+     *
+     * @param line        Strings array for each part of the line.
+     * @param correlative the thread-safe correlative container.
+     */
+    private void fillPrimaryKey(String @NotNull [] line, @NotNull AtomicLong correlative) {
         line[0] = period;
         line[1] = UUID.randomUUID().toString();
         line[2] = "M%09d".formatted(correlative.incrementAndGet());
     }
 
+    /**
+     * Inner function to format the CellData of a row into a String
+     * as specified by PLE - 0701 - Fixed assets. It'll contain windows
+     * end of line (\r\n) since PLE system only accepts said end of line.
+     *
+     * @author InfoYupay SACS
+     * @version 1.0
+     */
     private class LE0701Converter implements Function<List<CellData>, String> {
         private final AtomicLong correlative = new AtomicLong(0L);
 
         @Override
-        public String apply(List<CellData> cellData) {
+        public @NotNull String apply(@NotNull List<CellData> cellData) {
             var line = new String[38];
             fillPrimaryKey(line, correlative);
             line[3] = cellData.get(0).getFormattedValue();
@@ -148,9 +159,9 @@ public class AssetsProcessor implements BookProcessor {
             line[8] = cellData.get(10).getFormattedValue();
             line[9] = cellData.get(11).getFormattedValue();
             line[10] = "%.40s".formatted(cellData.get(3).getFormattedValue());
-            line[11] = "%.20s".formatted(cellData.get(13).getFormattedValue());
-            line[12] = "%.20s".formatted(cellData.get(14).getFormattedValue());
-            line[13] = "%.30s".formatted(cellData.get(15).getFormattedValue());
+            line[11] = "%.20s".formatted(Objects.requireNonNullElse(cellData.get(13).getFormattedValue(), "-"));
+            line[12] = "%.20s".formatted(Objects.requireNonNullElse(cellData.get(14).getFormattedValue(), "-"));
+            line[13] = "%.30s".formatted(Objects.requireNonNullElse(cellData.get(15).getFormattedValue(), "-"));
             line[14] = "%.2f".formatted(doubleFromCell(cellData.get(16)));
             line[15] = "%.2f".formatted(doubleFromCell(cellData.get(17)));
             line[16] = "%.2f".formatted(doubleFromCell(cellData.get(18)));
@@ -180,7 +191,14 @@ public class AssetsProcessor implements BookProcessor {
         }
     }
 
-
+    /**
+     * Inner function to format the CellData of a row into a String
+     * as specified by PLE - 0703 - Exchange rate difference. It'll contain windows
+     * end of line (\r\n) since PLE system only accepts said end of line.
+     *
+     * @author InfoYupay SACS
+     * @version 1.0
+     */
     private class LE0703Converter implements Function<List<CellData>, String> {
         private final AtomicLong correlative = new AtomicLong(0L);
 
@@ -206,11 +224,19 @@ public class AssetsProcessor implements BookProcessor {
         }
     }
 
+    /**
+     * Inner function to format the CellData of a row into a String
+     * as specified by PLE - 0704 - Leased assets. It'll contain windows
+     * end of line (\r\n) since PLE system only accepts said end of line.
+     *
+     * @author InfoYupay SACS
+     * @version 1.0
+     */
     private class LE0704Converter implements Function<List<CellData>, String> {
         private final AtomicLong correlative = new AtomicLong(0L);
 
         @Override
-        public String apply(List<CellData> cellData) {
+        public @NotNull String apply(@NotNull List<CellData> cellData) {
             var line = new String[12];
             fillPrimaryKey(line, correlative);
             line[3] = "9";

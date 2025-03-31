@@ -27,38 +27,41 @@ repositories {
 }
 
 dependencies {
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.12.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.12.1'
 
-    compile 'com.google.api-client:google-api-client:1.31.3'
-    compile 'com.google.oauth-client:google-oauth-client-jetty:1.31.4'
-    compile 'com.google.apis:google-api-services-sheets:v4-rev612-1.25.0'
-    compile 'com.google.apis:google-api-services-drive:v3-rev197-1.25.0'
+    //noinspection VulnerableLibrariesLocal
+    implementation 'com.google.api-client:google-api-client:2.7.2'
+    implementation 'com.google.oauth-client:google-oauth-client-jetty:1.39.0'
+    implementation 'com.google.apis:google-api-services-sheets:v4-rev20250211-2.0.0'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev20250220-2.0.0'
 
+    // https://mvnrepository.com/artifact/org.jetbrains/annotations
+    implementation("org.jetbrains:annotations:26.0.2")
 }
 
 test {
     useJUnitPlatform()
-    doFirst {
+    /*doFirst {
         jvmArgs = [
                 '--module-path', classpath.asPath,
         ]
-    }
+    }*/
 }
-
+/*
 compileJava {
     inputs.property("moduleName", "alexios.main")
-    sourceCompatibility = 16
-    targetCompatibility = 16
+    sourceCompatibility = 23
+    targetCompatibility = 23
     doFirst {
         options.compilerArgs = [
                 '--module-path', classpath.asPath,
         ]
         classpath = files()
     }
-}
+}*/
 
-compileTestJava {
+/*compileTestJava {
     inputs.property("moduleName", "alexios.main")
     doFirst {
         options.compilerArgs = [
@@ -69,5 +72,5 @@ compileTestJava {
         ]
         classpath = files()
     }
-}
+}*/
 

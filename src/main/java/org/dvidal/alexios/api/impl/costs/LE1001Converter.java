@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -26,7 +27,9 @@ import static org.dvidal.alexios.google.GoogleUtils.readDoubleBehind;
 
 /**
  * Converts the CellData of a row into a String line of PLE 100100 book.
+ * It shall add \r\n at the end of line.
  *
+ * @param year taxable year of the report.
  * @version 1.0
  */
 final record LE1001Converter(String year) implements Function<List<CellData>, String> {
@@ -40,7 +43,7 @@ final record LE1001Converter(String year) implements Function<List<CellData>, St
     }
 
     @Override
-    public String apply(List<CellData> cellData) {
+    public @NotNull String apply(List<CellData> cellData) {
         var line = new String[7];
         line[0] = year;
         readDoubleBehind(line, 1, 4, cellData);

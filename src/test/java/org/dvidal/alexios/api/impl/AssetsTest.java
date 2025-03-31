@@ -17,19 +17,21 @@
 
 package org.dvidal.alexios.api.impl;
 
+import org.dvidal.alexios.api.impl.assets.AssetsProcessor;
 import org.dvidal.alexios.google.GoogleUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 
 class AssetsTest {
-    static final String assetID = "1f4IlMSLRutavYJeyEx0G4jy2OdnSNLt8iQ8rl6HcBXg";
+    static final String assetID = "1rktsh1RbFaehDNa9NeHR0jQ5Dnvz-DCVMZMYGB6xmCI";
 
     @Test
     void testAssets() throws Exception {
         var sheet = GoogleUtils.getSpreadsheet(assetID);
-        var output = new File("testout", "LE070000");
-        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
+        var output = Path.of("/home/dvidal/Público/DIAR/2024/txt", "LE070000");
+        //if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
         new AssetsProcessor().processSheet(sheet, output);
     }
 }

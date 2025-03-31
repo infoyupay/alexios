@@ -21,15 +21,16 @@ import org.dvidal.alexios.google.GoogleUtils;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
+import java.nio.file.Path;
 
 class BalanceProcessorTest {
-    static final String balanceID = "1qiDvCzouLdvmXCVoNwBf4yHSxFrSyh0IRKfMzm2tFdk";
+    static final String balanceID = "1H1eky7_STw--tIu_T-l8Q89ES7wPvz6CkmB4pzYxlyQ";
 
     @Test
     void testExport() throws Exception {
         var sheet = GoogleUtils.getSpreadsheet(balanceID);
-        var output = new File("testout", "LE030000");
-        if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
+        var output = Path.of("testout", "LE030000");
+        //if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
         new BalanceProcessor().processSheet(sheet, output);
     }
 }

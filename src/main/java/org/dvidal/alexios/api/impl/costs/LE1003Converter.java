@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -28,7 +29,9 @@ import static org.dvidal.alexios.google.GoogleUtils.readDoubleBehind;
  * An inner function implementation to convert the google sheet row
  * in the form of a {@code List<CellData>} into a String as specified
  * by the PLE 100300 book.
+ * It shall add \r\n at the end of line.
  *
+ * @param year the tax year of the report.
  * @version 1.0
  */
 final record LE1003Converter(String year) implements Function<List<CellData>, String> {
@@ -43,7 +46,7 @@ final record LE1003Converter(String year) implements Function<List<CellData>, St
     }
 
     @Override
-    public String apply(List<CellData> cellData) {
+    public @NotNull String apply(@NotNull List<CellData> cellData) {
         var line = new String[14];
         line[0] = year;
         line[1] = cellData.get(0).getFormattedValue();

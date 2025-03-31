@@ -18,26 +18,38 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.Sheet;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.StringJoiner;
 import java.util.concurrent.Callable;
 
 import static org.dvidal.alexios.google.GoogleUtils.*;
 
+/**
+ * This is a processor obtain the SUNAT-PLE file for
+ * LE031601 - Business's capital.
+ *
+ * @param params parameters to perform conversion.
+ * @param target the target output folder path.
+ * @param aSheet the worksheeet object.
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 record LE031601Processor(Params03 params,
-                         File target,
-                         Sheet aSheet) implements Callable<File> {
+                         Path target,
+                         Sheet aSheet) implements Callable<Path> {
+
     @Override
-    public File call() throws IOException {
-        var r = new File(target,
+    public @NotNull Path call() throws IOException {
+        var r = target.resolve(
                 params.compileFile("031601", infoFlag(aSheet)));
         recreateFile(r);
-        try (var fos = new FileOutputStream(r);
+        try (var fos = Files.newOutputStream(r);
              var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
             var grid = aSheet.getData().get(0);
             ps.print(new StringJoiner("|")

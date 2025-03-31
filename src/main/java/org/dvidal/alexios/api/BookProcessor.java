@@ -19,13 +19,15 @@ package org.dvidal.alexios.api;
 
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
+import java.nio.file.Path;
 
 /**
  * The book processor is the responsible for creating the output TXT
  * from a google spreadsheet object.
  *
+ * @author InfoYupay SACS
  * @version 1.0
  */
 public interface BookProcessor {
@@ -44,7 +46,7 @@ public interface BookProcessor {
      * @param target      the directory where files should be saved.
      * @throws Exception if implementation requires so.
      */
-    void processSheet(Spreadsheet spreadsheet, File target) throws Exception;
+    void processSheet(Spreadsheet spreadsheet, Path target) throws Exception;
 
     /**
      * Convenient method to read the boolean value of A1.
@@ -53,14 +55,14 @@ public interface BookProcessor {
      * @param worksheet the sheet where to find.
      * @return true if checked, false otherwise.
      */
-    default boolean readInfoFlag(Sheet worksheet) {
+    default boolean readInfoFlag(@NotNull Sheet worksheet) {
         return worksheet
                 .getData()
-                .get(0)
+                .getFirst()
                 .getRowData()
-                .get(0)
+                .getFirst()
                 .getValues()
-                .get(0)
+                .getFirst()
                 .getEffectiveValue()
                 .getBoolValue();
     }

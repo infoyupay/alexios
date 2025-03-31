@@ -18,5 +18,6 @@
  * Support for LE0300 specification - balance and inventory.
  *
  * @version 1.0
+ * @author InfoYupay SACS
  */
 package org.dvidal.alexios.api.impl.balances;

@@ -18,7 +18,8 @@
 package org.dvidal.alexios.api.impl.pdt710;
 
 import com.google.api.services.sheets.v4.model.CellData;
-import org.dvidal.alexios.google.GoogleUtils;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -49,7 +50,8 @@ record PDTFieldProcessor(NamesProcessor onName, int amountIx) implements Functio
      *
      * @return a new processor for Accounts Receivable.
      */
-    static PDTFieldProcessor receivable() {
+    @Contract(" -> new")
+    static @NotNull PDTFieldProcessor receivable() {
         return new PDTFieldProcessor(3, 5);
     }
 
@@ -59,7 +61,8 @@ record PDTFieldProcessor(NamesProcessor onName, int amountIx) implements Functio
      *
      * @return a new processort for Accounts doubtful.
      */
-    static PDTFieldProcessor doubtful() {
+    @Contract(" -> new")
+    static @NotNull PDTFieldProcessor doubtful() {
         return new PDTFieldProcessor(3, 9);
     }
 
@@ -69,7 +72,8 @@ record PDTFieldProcessor(NamesProcessor onName, int amountIx) implements Functio
      *
      * @return trade accounts payable processor.
      */
-    static PDTFieldProcessor payableTrade() {
+    @Contract(" -> new")
+    static @NotNull PDTFieldProcessor payableTrade() {
         return new PDTFieldProcessor(4, 5);
     }
 
@@ -79,12 +83,13 @@ record PDTFieldProcessor(NamesProcessor onName, int amountIx) implements Functio
      *
      * @return other accounts payable processor.
      */
-    static PDTFieldProcessor payableOthers() {
+    @Contract(" -> new")
+    static @NotNull PDTFieldProcessor payableOthers() {
         return new PDTFieldProcessor(4, 6);
     }
 
     @Override
-    public PDTField apply(List<CellData> cellData) {
+    public @NotNull PDTField apply(@NotNull List<CellData> cellData) {
         var r = new PDTField();
         r.parseDoiType(cellData.get(0).getFormattedValue());
         r.doiNum = cellData.get(2).getFormattedValue();

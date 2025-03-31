@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.pdt710;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +34,11 @@ import java.util.function.Predicate;
  */
 record FlagFilter(int index, String flag) implements Predicate<List<CellData>> {
     @Override
-    public boolean test(List<CellData> cellData) {
+    public boolean test(@NotNull List<CellData> cellData) {
         //Check if first column is null, empty or blank.
         //If so, ignore row by returning false.
         if (cellData.isEmpty()) return false;
-        var first = cellData.get(0).getFormattedValue();
+        var first = cellData.getFirst().getFormattedValue();
         if (first==null || first.isBlank()) return false;
 
         //Check data

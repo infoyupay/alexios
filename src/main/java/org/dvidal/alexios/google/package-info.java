@@ -18,5 +18,6 @@
  * This package supports interops with Google Sheets API.
  *
  * @version 1.0
+ * @author InfoYupay SACS
  */
 package org.dvidal.alexios.google;

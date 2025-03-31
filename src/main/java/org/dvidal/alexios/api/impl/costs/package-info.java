@@ -18,5 +18,6 @@
  * This package supports processing of book 100000 - Costs.
  *
  * @version 1.0
+ * @author InfoYupay SACS
  */
 package org.dvidal.alexios.api.impl.costs;

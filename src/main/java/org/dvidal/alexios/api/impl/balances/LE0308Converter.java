@@ -18,29 +18,45 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 import static org.dvidal.alexios.google.GoogleUtils.*;
 
+/**
+ * Function to convert a row of CellData into a SUNAT-PLE txt tuple for
+ * LE030800 - movable investments.
+ * <br/>
+ * It shall add \r\n at the end of line.
+ *
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 final class LE0308Converter implements Function<List<CellData>, String> {
     private final Params03 params;
-    long correlative = 0;
+    private final AtomicLong correlative = new AtomicLong(0);
 
+    /**
+     * Canonical constructor.
+     *
+     * @param params the parameters to perform formatting.
+     */
     LE0308Converter(Params03 params) {
         this.params = params;
     }
 
     @Override
-    public String apply(List<CellData> cellData) {
+    public String apply(@NotNull List<CellData> cellData) {
         return new StringJoiner("|")
                 .add(params.periodID())//1
                 .add(UUID.randomUUID().toString())//2
-                .add("M%09d".formatted(++correlative))//3
+                .add("M%09d".formatted(correlative.incrementAndGet()))//3
                 .add(cellData.get(0).getFormattedValue())//4
                 .add(cellData.get(2).getFormattedValue())//5
                 .add("%.100s".formatted(cellData.get(3).getFormattedValue()))//6
@@ -55,6 +71,11 @@ final class LE0308Converter implements Function<List<CellData>, String> {
                 .toString();
     }
 
+    /**
+     * Accessor for params.
+     *
+     * @return parameters to perform conversion.
+     */
     public Params03 params() {
         return params;
     }

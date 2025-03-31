@@ -19,8 +19,10 @@ package org.dvidal.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import org.dvidal.alexios.api.BookProcessor;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.nio.file.Path;
 
 import static org.dvidal.alexios.google.GoogleUtils.exportFile;
 import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
@@ -38,12 +40,15 @@ public class CostsProcessor implements BookProcessor {
     }
 
     @Override
-    public void processSheet(Spreadsheet spreadsheet, File target) throws Exception {
+    public void processSheet(@NotNull Spreadsheet spreadsheet, Path target) throws Exception {
+        //Extract parameters from LE100000 sheet.
         var params = spreadsheet.getSheets().stream()
                 .filter(ss -> "LE100000".equals(ss.getProperties().getTitle()))
                 .findAny()
                 .map(LE1000Params::fromSheet)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find LE100000 worksheet."));
+
+        //Check all worksheets.
         for (var worksheet : spreadsheet.getSheets()) {
 
             switch (worksheet.getProperties().getTitle()) {
@@ -79,7 +84,7 @@ public class CostsProcessor implements BookProcessor {
      * @param info   the info flag (if false=no information is sent; true otherwise).
      * @return the file name.
      */
-    private String compileName(LE1000Params params, String bookID, boolean info) {
+    private @NotNull String compileName(@NotNull LE1000Params params, String bookID, boolean info) {
         return "LE%s%s0000%s00%s%s11.TXT".formatted(
                 params.ruc(),
                 params.year(),

@@ -19,29 +19,45 @@ package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.Sheet;
 import org.dvidal.alexios.google.GoogleUtils;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
+import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
-import static org.dvidal.alexios.google.GoogleUtils.recreateFileIf;
 
+/**
+ * Processor (callable) to download a file from google drive and store it with the
+ * compiled file name as required by SUNAT-PLE specs 03230 (financial statement notes).
+ *
+ * @param params the parameters to compile the filename.
+ * @param target the target output path.
+ * @param aSheet worksheet containing the drive id at 2,2 cell.
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 record LE0323Processor(Params03 params,
-                       File target,
-                       Sheet aSheet) implements Callable<File> {
+                       Path target,
+                       Sheet aSheet) implements Callable<Path> {
 
     @Override
-    public File call() throws Exception {
+    public @NotNull Path call() throws Exception {
+        //Check information flag.
         var iflg = infoFlag(aSheet);
-        var r = new File(target, params.compileFile(
+        //Compile the file name.
+        var r = target.resolve(params.compileFile(
                 "032300",
                 iflg,
                 "pdf"));
-        recreateFileIf(r, !iflg);
-
-        var driveToken = GoogleUtils.stringAt(aSheet.getData().get(0), 2, 2);
-        GoogleUtils.downloadDriveFile(driveToken, r);
+        //Create an empty file.
+        GoogleUtils.recreateFile(r);
+        //Of information flag is true...
+        if (iflg) {
+            //Get the google drive file token/id.
+            var driveToken = GoogleUtils.stringAt(aSheet.getData().getFirst(), 2, 2);
+            //Download file to destination.
+            GoogleUtils.downloadDriveFile(driveToken, r);
+        }
         return r;
     }
 }

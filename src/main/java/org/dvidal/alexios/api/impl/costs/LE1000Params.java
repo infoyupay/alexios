@@ -18,10 +18,15 @@
 package org.dvidal.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.Sheet;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Inner record to retrieve required parameters from a spreadsheet.
  *
+ * @param ops  the operations flag value.
+ * @param ruc  the tax payer ID.
+ * @param year the year of the reports.
  * @version 1.0
  */
 record LE1000Params(String ruc, String year, String ops) {
@@ -31,8 +36,9 @@ record LE1000Params(String ruc, String year, String ops) {
      * @param aSheet the main worksheet.
      * @return a record with ruc, year and ops.
      */
-    static LE1000Params fromSheet(Sheet aSheet) {
-        var data = aSheet.getData().get(0).getRowData();
+    @Contract("_ -> new")
+    static @NotNull LE1000Params fromSheet(@NotNull Sheet aSheet) {
+        var data = aSheet.getData().getFirst().getRowData();
         var ruc = data.get(4).getValues().get(1).getFormattedValue();
         var year = data.get(5).getValues().get(1).getFormattedValue();
         var ops = data.get(6).getValues().get(1).getFormattedValue();

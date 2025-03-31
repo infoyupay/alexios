@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.function.Function;
@@ -27,10 +28,12 @@ import static org.dvidal.alexios.google.GoogleUtils.*;
 /**
  * Inner function to take a row as a {@code List<CellData>} and convert
  * it into a pretty plain text tuple as specified by PLE 100200 book.
+ * It shall add \r\n at the end of line.
  *
+ * @param year the tax year of the report.
  * @version 1.0
  */
-final record LE1002Converter(String year) implements Function<List<CellData>, String> {
+record LE1002Converter(String year) implements Function<List<CellData>, String> {
     /**
      * Default constructor.
      *
@@ -40,7 +43,7 @@ final record LE1002Converter(String year) implements Function<List<CellData>, St
     }
 
     @Override
-    public String apply(List<CellData> cellData) {
+    public @NotNull String apply(@NotNull List<CellData> cellData) {
         var line = new String[9];
         line[0] = "%s%02d00".formatted(year, intFromCell(cellData.get(0)));
         line[1] = "%.2f".formatted(doubleFromCell(cellData.get(2)));

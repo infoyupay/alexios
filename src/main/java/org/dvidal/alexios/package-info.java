@@ -17,6 +17,7 @@
 /**
  * This is the main package of Alexios APP.
  *
+ * @author InfoYupay SACS
  * @version 1.0
  */
 package org.dvidal.alexios;

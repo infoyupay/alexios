@@ -18,6 +18,7 @@
 package org.dvidal.alexios.api.impl.balances;
 
 import com.google.api.services.sheets.v4.model.CellData;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -26,16 +27,30 @@ import java.util.function.Function;
 
 import static org.dvidal.alexios.google.GoogleUtils.*;
 
+/**
+ * This function converts a row of CellData into a SUNAT-PLE txt tuple for
+ * LE0311 - Wages and shares payable.
+ * <br/>
+ * It shall add \r\n at the end of line.
+ *
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 final class LE0311Converter implements Function<List<CellData>, String> {
     final Params03 params;
     long correlative = 0;
 
+    /**
+     * Canonical constructor.
+     *
+     * @param params the paremeters to perform conversion.
+     */
     public LE0311Converter(Params03 params) {
         this.params = params;
     }
 
     @Override
-    public String apply(List<CellData> cellData) {
+    public String apply(@NotNull List<CellData> cellData) {
         return new StringJoiner("|")
                 .add(params.periodID())//1
                 .add(UUID.randomUUID().toString())//2
