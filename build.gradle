@@ -19,7 +19,7 @@ plugins {
     id 'java'
 }
 
-group 'org.dvidal'
+group 'org.yupay'
 version '1.0'
 
 repositories {
@@ -43,35 +43,4 @@ dependencies {
 
 test {
     useJUnitPlatform()
-    /*doFirst {
-        jvmArgs = [
-                '--module-path', classpath.asPath,
-        ]
-    }*/
 }
-/*
-compileJava {
-    inputs.property("moduleName", "alexios.main")
-    sourceCompatibility = 23
-    targetCompatibility = 23
-    doFirst {
-        options.compilerArgs = [
-                '--module-path', classpath.asPath,
-        ]
-        classpath = files()
-    }
-}*/
-
-/*compileTestJava {
-    inputs.property("moduleName", "alexios.main")
-    doFirst {
-        options.compilerArgs = [
-                '--module-path', classpath.asPath,
-                '--add-modules', 'org.junit.jupiter.api',
-                '--add-reads', "alexios.main=org.junit.jupiter.api",
-                '--patch-module', "alexios.main=" + files(sourceSets.test.java.srcDirs).asPath,
-        ]
-        classpath = files()
-    }
-}*/
-

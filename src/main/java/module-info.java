@@ -15,5 +15,5 @@ module alexios.main {
     requires com.google.api.services.sheets;
     requires com.google.api.services.drive;
 
-    opens org.dvidal.alexios.api;
+    opens org.yupay.alexios.api;
 }
