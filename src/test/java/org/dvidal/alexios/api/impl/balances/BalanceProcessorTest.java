@@ -20,7 +20,6 @@ package org.dvidal.alexios.api.impl.balances;
 import org.dvidal.alexios.google.GoogleUtils;
 import org.junit.jupiter.api.Test;
 
-import java.io.File;
 import java.nio.file.Path;
 
 class BalanceProcessorTest {

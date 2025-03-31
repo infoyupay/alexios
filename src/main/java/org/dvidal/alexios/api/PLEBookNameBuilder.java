@@ -110,6 +110,7 @@ public class PLEBookNameBuilder {
      * @param day new value to set in {@link #day}
      * @return this instance.
      */
+    @SuppressWarnings("unused")
     public final PLEBookNameBuilder withDay(String day) {
         this.day = day;
         return this;
@@ -132,6 +133,7 @@ public class PLEBookNameBuilder {
      * @param oportunity new value to set in {@link #oportunity}
      * @return this instance.
      */
+    @SuppressWarnings("unused")
     public final PLEBookNameBuilder withOportunity(String oportunity) {
         this.oportunity = oportunity;
         return this;
@@ -165,6 +167,7 @@ public class PLEBookNameBuilder {
      * @param extension new value to set in {@link #extension}
      * @return this instance.
      */
+    @SuppressWarnings("unused")
     public final PLEBookNameBuilder withExtension(String extension) {
         this.extension = extension;
         return this;

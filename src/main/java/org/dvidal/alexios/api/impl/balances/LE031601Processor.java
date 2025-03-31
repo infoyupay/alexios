@@ -51,7 +51,7 @@ record LE031601Processor(Params03 params,
         recreateFile(r);
         try (var fos = Files.newOutputStream(r);
              var ps = new PrintStream(fos, true, StandardCharsets.UTF_8)) {
-            var grid = aSheet.getData().get(0);
+            var grid = aSheet.getData().getFirst();
             ps.print(new StringJoiner("|")
                     .add(params.periodID())//1
                     .add("%.2f".formatted(decimalAt(grid, 3, 0)))//2

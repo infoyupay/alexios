@@ -419,7 +419,6 @@ public class GoogleUtils {
      */
     public static void recreateFile(Path aFile) throws IOException {
         Files.write(aFile, new byte[0]);
-        //TODO: TEST IT!
     }
 
     /**

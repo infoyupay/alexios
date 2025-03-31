@@ -32,7 +32,7 @@ import static org.dvidal.alexios.google.GoogleUtils.readDoubleBehind;
  * @param year taxable year of the report.
  * @version 1.0
  */
-final record LE1001Converter(String year) implements Function<List<CellData>, String> {
+record LE1001Converter(String year) implements Function<List<CellData>, String> {
     /**
      * Constructor of this class.
      *

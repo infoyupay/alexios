@@ -36,6 +36,7 @@ public interface BookProcessor {
      *
      * @return the book title.
      */
+    @SuppressWarnings("unused")
     String title();
 
     /**
