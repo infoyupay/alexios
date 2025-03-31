@@ -34,7 +34,7 @@ import static org.dvidal.alexios.google.GoogleUtils.readDoubleBehind;
  * @param year the tax year of the report.
  * @version 1.0
  */
-final record LE1003Converter(String year) implements Function<List<CellData>, String> {
+record LE1003Converter(String year) implements Function<List<CellData>, String> {
     /**
      * Default constructor. "0000" will be appended to
      * the year to match PLE specification.
