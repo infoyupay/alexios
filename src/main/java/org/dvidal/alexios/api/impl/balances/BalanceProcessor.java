@@ -41,10 +41,6 @@ import static org.dvidal.alexios.google.GoogleUtils.recreateFile;
  * @version 1.0
  */
 public class BalanceProcessor implements BookProcessor {
-    @Override
-    public String title() {
-        return "LE030000 - Libro de Inventarios y Balances";
-    }
 
     @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {

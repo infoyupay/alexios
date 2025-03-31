@@ -46,11 +46,6 @@ public class AssetsProcessor implements BookProcessor {
     private String opsFlag;
 
     @Override
-    public String title() {
-        return "LE070000 - Registro de Activos Fijos.";
-    }
-
-    @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {
         //Retrieve parameters from the 070000 sheetName.
         retrieveParameters(spreadsheet);

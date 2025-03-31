@@ -21,7 +21,6 @@ import com.google.api.services.sheets.v4.model.RowData;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import org.dvidal.alexios.api.BookProcessor;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -43,12 +42,6 @@ import static org.dvidal.alexios.google.GoogleUtils.*;
  * @version 1.0
  */
 public final class PDTProcessor implements BookProcessor {
-
-    @Contract(pure = true)
-    @Override
-    public @NotNull String title() {
-        return "PDT 710 - Renta Anual";
-    }
 
     @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {

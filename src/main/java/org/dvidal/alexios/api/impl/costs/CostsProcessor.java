@@ -33,10 +33,6 @@ import static org.dvidal.alexios.google.GoogleUtils.infoFlag;
  * @version 1.0
  */
 public class CostsProcessor implements BookProcessor {
-    @Override
-    public String title() {
-        return "LE100000 - Registro de Costos.";
-    }
 
     @Override
     public void processSheet(@NotNull Spreadsheet spreadsheet, Path target) throws Exception {

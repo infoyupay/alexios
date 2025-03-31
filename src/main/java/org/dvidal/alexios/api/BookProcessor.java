@@ -31,13 +31,6 @@ import java.nio.file.Path;
  * @version 1.0
  */
 public interface BookProcessor {
-    /**
-     * The book firendly title to show to user.
-     *
-     * @return the book title.
-     */
-    @SuppressWarnings("unused")
-    String title();
 
     /**
      * Processes a sheetName, transforming the google data
