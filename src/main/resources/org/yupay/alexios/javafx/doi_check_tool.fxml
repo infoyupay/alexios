@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (C) 2021 David Vidal Escudero - Free Open Source Software Consultancy
+  ~
+  ~       This program is free software: you can redistribute it and/or modify
+  ~       it under the terms of the GNU General Public License as published by
+  ~       the Free Software Foundation, either version 3 of the License, or
+  ~       (at your option) any later version.
+  ~
+  ~       This program is distributed in the hope that it will be useful,
+  ~       but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~       GNU General Public License for more details.
+  ~
+  ~       You should have received a copy of the GNU General Public License
+  ~       along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.scene.control.*?>
+<?import org.yupay.alexios.javafx.DoiMissmatchTreeViewFactories?>
+<DialogPane xmlns:fx="http://javafx.com/fxml"
+            xmlns="http://javafx.com/javafx"
+            fx:controller="org.yupay.alexios.javafx.FxDoiCheckTool"
+            fx:id="top"
+            prefHeight="400.0" prefWidth="600.0">
+    <content>
+        <TreeTableView fx:id="ttbResults" showRoot="false">
+            <placeholder>
+                <Label text="Esta herramienta no halló números de identificación con problemas."/>
+            </placeholder>
+            <columns>
+                <TreeTableColumn text="Fila" prefWidth="100">
+                    <cellValueFactory>
+                        <DoiMissmatchTreeViewFactories fx:factory="rowTreeViewValueFactory"/>
+                    </cellValueFactory>
+                </TreeTableColumn>
+                <TreeTableColumn text="Documento de Identificación">
+                    <columns>
+                        <TreeTableColumn text="Tipo" prefWidth="100">
+                            <cellValueFactory>
+                                <DoiMissmatchTreeViewFactories fx:factory="doiTypeTreeViewValueFactory"/>
+                            </cellValueFactory>
+                        </TreeTableColumn>
+                        <TreeTableColumn text="Número" prefWidth="300">
+                            <cellValueFactory>
+                                <DoiMissmatchTreeViewFactories fx:factory="doiNumTreeViewValueFactory"/>
+                            </cellValueFactory>
+                        </TreeTableColumn>
+                    </columns>
+                </TreeTableColumn>
+            </columns>
+        </TreeTableView>
+    </content>
+    <ButtonType fx:constant="CLOSE"/>
+</DialogPane>

@@ -15,21 +15,23 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.yupay.alexios.api.impl.balances;
+package org.yupay.alexios.javafx;
 
-import org.yupay.alexios.google.GoogleUtils;
-import org.junit.jupiter.api.Test;
+import javafx.application.Application;
+import javafx.stage.Stage;
 
-import java.nio.file.Path;
+public class FxAlexios extends Application {
+    public static void main(String[] args) {
+        launch(args);
+    }
 
-class BalanceProcessorTest {
-    static final String balanceID = "1H1eky7_STw--tIu_T-l8Q89ES7wPvz6CkmB4pzYxlyQ";
-
-    @Test
-    void testExport() throws Exception {
-        var sheet = GoogleUtils.getSpreadsheet(balanceID);
-        var output = Path.of("testout", "LE030000");
-        //if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
-        new BalanceProcessor().processSheet(sheet, output);
+    @Override
+    public void start(Stage stage) throws Exception {
+        var fxMain = FxMainScene.create();
+        fxMain.addToStage(stage);
+        stage.setTitle("Alexios");
+        stage.sizeToScene();
+        stage.setResizable(false);
+        stage.show();
     }
 }

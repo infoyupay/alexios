@@ -29,13 +29,17 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.SheetsScopes;
 import com.google.api.services.sheets.v4.model.*;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.yupay.alexios.vault.LocalPaths;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -57,9 +61,14 @@ import java.util.stream.Collectors;
  */
 public class GoogleUtils {
     /**
+     * Spreadsheets mime type constant.
+     */
+    public static final String SPREADSHEET_MIME = "application/vnd.google-apps.spreadsheet";
+    /**
      * Decimal format symbols for PLE specs.
      */
     public static final DecimalFormatSymbols PLE_SYM = new DecimalFormatSymbols() {
+
 
         @Override
         public char getDecimalSeparator() {
@@ -87,10 +96,7 @@ public class GoogleUtils {
      * The default Json Factory, which is Gson.
      */
     public static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    /**
-     * The system path to store tokens.
-     */
-    public static final String TOKENS_PATH = "tokens";
+
     /**
      * A scope to read spreadsheets with the following scopes:
      * <ol>
@@ -99,10 +105,6 @@ public class GoogleUtils {
      * </ol>
      */
     public static final List<String> SCOPES = List.of(SheetsScopes.SPREADSHEETS_READONLY, DriveScopes.DRIVE_READONLY);
-    /**
-     * A resource path to credentials.json file.
-     */
-    public static final String CREDENTIALS_PATH = "/credentials.json";
 
     static {
         PLE_FMT.setParseBigDecimal(true);
@@ -141,18 +143,18 @@ public class GoogleUtils {
      * @throws IOException if the credentials resources cannot be loaded.
      */
     public static Credential getCredentials(final NetHttpTransport transport, final List<String> scopes) throws IOException {
-        var is = GoogleUtils.class.getResourceAsStream(CREDENTIALS_PATH);
-        if (is == null)
-            throw new FileNotFoundException("Resource not found " + CREDENTIALS_PATH);
-        var secrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(is));
-        var flow = new GoogleAuthorizationCodeFlow.Builder(transport, JSON_FACTORY, secrets, scopes)
-                .setDataStoreFactory(new FileDataStoreFactory(new File(TOKENS_PATH)))
-                .setAccessType("offline")
-                .build();
-        var receiver = new LocalServerReceiver.Builder()
-                .setPort(8888)
-                .build();
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        try (var is = Files.newInputStream(LocalPaths.GOOGLE_CREDENTIAL)) {
+            var secrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(is));
+            Files.createDirectories(LocalPaths.GOOGLE_TOKENS);
+            var flow = new GoogleAuthorizationCodeFlow.Builder(transport, JSON_FACTORY, secrets, scopes)
+                    .setDataStoreFactory(new FileDataStoreFactory(LocalPaths.GOOGLE_TOKENS.toFile()))
+                    .setAccessType("offline")
+                    .build();
+            var receiver = new LocalServerReceiver.Builder()
+                    .setPort(8888)
+                    .build();
+            return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+        }
     }
 
 
@@ -183,13 +185,35 @@ public class GoogleUtils {
      */
     public static void downloadDriveFile(final String driveID, final Path target) throws IOException, GeneralSecurityException {
         final var transport = GoogleNetHttpTransport.newTrustedTransport();
-        final var service = new Drive.Builder(transport, JSON_FACTORY, getCredentialsDrive(transport))
+        final var drive = new Drive.Builder(transport, JSON_FACTORY, getCredentialsDrive(transport))
                 .setApplicationName(APP_NAME)
                 .build();
-
         try (var fos = Files.newOutputStream(target)) {
-            service.files().get(driveID).executeMediaAndDownloadTo(fos);
+            drive.files().get(driveID)
+                    .setSupportsAllDrives(true)
+                    .setSupportsTeamDrives(true)
+                    .executeMediaAndDownloadTo(fos);
         }
+    }
+
+    /**
+     * Retrieves a google drive file metadata.
+     *
+     * @param driveID the google drive file ID.
+     * @return the file object containing metadata.
+     * @throws IOException              if cannot write or read.
+     * @throws GeneralSecurityException if security manager throws it.
+     */
+    public static File getMetadata(final String driveID) throws IOException, GeneralSecurityException {
+        final var transport = GoogleNetHttpTransport.newTrustedTransport();
+        final var drive = new Drive.Builder(transport, JSON_FACTORY, getCredentialsDrive(transport))
+                .setApplicationName(APP_NAME)
+                .build();
+        return drive.files()
+                .get(driveID)
+                .setSupportsTeamDrives(true)
+                .setSupportsAllDrives(true)
+                .execute();
     }
 
     /**
@@ -577,4 +601,5 @@ public class GoogleUtils {
     public static @NotNull IllegalArgumentException noSheet(String sheetName) {
         return new IllegalArgumentException("Cannot find sheet with name: " + sheetName);
     }
+
 }

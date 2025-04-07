@@ -15,5 +15,15 @@ module alexios.main {
     requires com.google.api.services.sheets;
     requires com.google.api.services.drive;
 
+    requires javafx.base;
+    requires javafx.controls;
+    requires javafx.fxml;
+    requires javafx.web;
+    requires javafx.graphics;
+    requires java.desktop;
+
+    exports org.yupay.alexios.javafx;
+
     opens org.yupay.alexios.api;
+    opens org.yupay.alexios.javafx to javafx.fxml, javafx.controls, javafx.base, javafx.web;
 }

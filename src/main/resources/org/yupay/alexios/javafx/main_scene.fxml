@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (C) 2021 David Vidal Escudero - Free Open Source Software Consultancy
+  ~
+  ~       This program is free software: you can redistribute it and/or modify
+  ~       it under the terms of the GNU General Public License as published by
+  ~       the Free Software Foundation, either version 3 of the License, or
+  ~       (at your option) any later version.
+  ~  
+  ~       This program is distributed in the hope that it will be useful,
+  ~       but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~       GNU General Public License for more details.
+  ~  
+  ~       You should have received a copy of the GNU General Public License
+  ~       along with this program.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.Scene?>
+<?import javafx.scene.web.WebView?>
+<Scene xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/23.0.1"
+       fx:controller="org.yupay.alexios.javafx.FxMainScene" fx:id="top">
+    <Accordion minHeight="600.0" minWidth="600.0" expandedPane="$pnlAbout">
+        <panes>
+            <TitledPane fx:id="pnlAbout" text="Acerca de...">
+                <graphic>
+                    <ImageView fitHeight="32" fitWidth="32">
+                        <Image url="@icons8-about-32.png"/>
+                    </ImageView>
+                </graphic>
+                <WebView prefHeight="-1.0" prefWidth="-1.0" fx:id="webAbout"/>
+            </TitledPane>
+            <TitledPane text="LE0300 - Inventarios y Balances">
+                <graphic>
+                    <ImageView fitHeight="32" fitWidth="32">
+                        <Image url="@icons8-invoice-32.png"/>
+                    </ImageView>
+                </graphic>
+
+                <VBox spacing="5.0">
+                    <padding>
+                        <Insets left="5.0" top="5.0"/>
+                    </padding>
+                    <HBox spacing="5.0">
+                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0"
+                               text="Archivo de Google Drive:"/>
+                        <Hyperlink maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                                   prefHeight="32.0" text="${controller.book0300File}" HBox.hgrow="ALWAYS"
+                                   userData="0300" onDragOver="#inputDragOver" onDragDropped="#inputDragDrop"
+                                   onDragEntered="#inputDragEntered" onDragExited="#inputDragExited">
+                            <contextMenu>
+                                <ContextMenu>
+                                    <items>
+                                        <CustomMenuItem>
+                                            <content>
+                                                <TextField promptText="Link de google drive..."
+                                                           onAction="#setLinkAction" userData="0300"/>
+                                            </content>
+                                        </CustomMenuItem>
+                                    </items>
+                                </ContextMenu>
+                            </contextMenu>
+                        </Hyperlink>
+                    </HBox>
+                    <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="32.0"
+                            text="Revisar Números de Identificación" onAction="#checkDoi">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-verify-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="32.0"
+                            text="Ejecutar" onAction="#exportAction" userData="0300">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-txt-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="32.0"
+                            text="Generar PDT710" onAction="#exportAction" userData="710">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@SUNAT.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </VBox>
+            </TitledPane>
+            <TitledPane text="LE0700 - Acitvo Fijo">
+                <graphic>
+                    <ImageView fitHeight="32" fitWidth="32">
+                        <Image url="@icons8-asset-32.png"/>
+                    </ImageView>
+                </graphic>
+                <VBox spacing="5.0">
+                    <padding>
+                        <Insets left="5.0" top="5.0"/>
+                    </padding>
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <HBox spacing="5.0">
+                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0"
+                               text="Archivo de Google Drive:"/>
+                        <Hyperlink maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                                   prefHeight="32.0" text="${controller.book0700File}" HBox.hgrow="ALWAYS"
+                                   userData="0700" onDragOver="#inputDragOver" onDragDropped="#inputDragDrop"
+                                   onDragEntered="#inputDragEntered" onDragExited="#inputDragExited">
+                            <contextMenu>
+                                <ContextMenu>
+                                    <items>
+                                        <CustomMenuItem>
+                                            <content>
+                                                <TextField promptText="Link de google drive..."
+                                                           onAction="#setLinkAction" userData="0700"/>
+                                            </content>
+                                        </CustomMenuItem>
+                                    </items>
+                                </ContextMenu>
+                            </contextMenu>
+                        </Hyperlink>
+                    </HBox>
+                    <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="32.0"
+                            text="Ejecutar" onAction="#exportAction" userData="0700">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-txt-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </VBox>
+            </TitledPane>
+            <TitledPane text="LE1000 - Costos">
+                <graphic>
+                    <ImageView fitHeight="32" fitWidth="32">
+                        <Image url="@icons8-dollar-bag-32.png"/>
+                    </ImageView>
+                </graphic>
+                <VBox spacing="5.0">
+                    <padding>
+                        <Insets left="5.0" top="5.0"/>
+                    </padding>
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <HBox spacing="5.0">
+                        <Label maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0"
+                               text="Archivo de Google Drive:"/>
+                        <Hyperlink maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                                   prefHeight="32.0" text="${controller.book1000File}" HBox.hgrow="ALWAYS"
+                                   userData="1000" onDragOver="#inputDragOver" onDragDropped="#inputDragDrop"
+                                   onDragEntered="#inputDragEntered" onDragExited="#inputDragExited">
+                            <contextMenu>
+                                <ContextMenu>
+                                    <items>
+                                        <CustomMenuItem>
+                                            <content>
+                                                <TextField promptText="Link de google drive..."
+                                                           onAction="#setLinkAction" userData="1000"/>
+                                            </content>
+                                        </CustomMenuItem>
+                                    </items>
+                                </ContextMenu>
+                            </contextMenu>
+                        </Hyperlink>
+                    </HBox>
+                    <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="32.0"
+                            text="Ejecutar" onAction="#exportAction" userData="1000">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-txt-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </VBox>
+            </TitledPane>
+            <TitledPane text="Configuración Local">
+                <graphic>
+                    <ImageView fitHeight="32" fitWidth="32">
+                        <Image url="@icons8-administrative-tools-32.png"/>
+                    </ImageView>
+                </graphic>
+                <VBox spacing="5.0">
+                    <padding>
+                        <Insets left="5.0" top="5.0"/>
+                    </padding>
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                    <HBox spacing="5.0"/>
+                    <Button maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false" prefHeight="32.0"
+                            text="Instalar credencial" onAction="#installCredentialAction">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-key-install-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button layoutX="15.0" layoutY="20.0" maxHeight="-Infinity" minHeight="-Infinity"
+                            mnemonicParsing="false" prefHeight="32.0" text="Limpiar credencial"
+                            onAction="#cleanCredentialAction">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-key-delete-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <Button layoutX="15.0" layoutY="57.0" maxHeight="-Infinity" minHeight="-Infinity"
+                            mnemonicParsing="false" prefHeight="32.0" text="Limpiar tokens"
+                            onAction="#cleanTokensAction">
+                        <graphic>
+                            <ImageView fitHeight="32.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+                                <Image url="@icons8-dynamite-32.png"/>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </VBox>
+            </TitledPane>
+        </panes>
+    </Accordion>
+</Scene>

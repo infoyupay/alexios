@@ -15,21 +15,17 @@
  *       along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package org.yupay.alexios.api.impl.costs;
+package org.yupay.alexios.javafx;
 
-import org.yupay.alexios.google.GoogleUtils;
-import org.junit.jupiter.api.Test;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
-import java.nio.file.Path;
-
-class CostsProcessorTest {
-    static final String costID = "1Q1ykd6IKSTtqVDOaV19lYN6vWU1nUPS_2aQirg0-Kd8";
-
-    @Test
-    void testExport() throws Exception {
-        var sheet = GoogleUtils.getSpreadsheet(costID);
-        var output = Path.of("/home/dvidal/Público/DIAR/2024/tm", "LE100000");
-        //if (!output.exists()) System.out.printf("output mkdirs: %b%n", output.mkdirs());
-        new CostsProcessor().processSheet(sheet, output);
-    }
+/**
+ * Annotation to not check unused method while inspectioning property() accessors.
+ *
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
+@Retention(RetentionPolicy.SOURCE)
+public @interface FxProperty {
 }
