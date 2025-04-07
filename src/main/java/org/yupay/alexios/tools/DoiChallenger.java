@@ -27,6 +27,7 @@ import java.util.function.IntUnaryOperator;
  *
  * @param doiType   the doiType value.
  * @param doiNumber the doiNumber value.
+ * @param rowIndex  the row index value where the DOI comes from.
  * @author InfoYupay SACS
  * @version 1.0
  */
@@ -40,7 +41,10 @@ public record DoiChallenger(@Nullable String doiType, @NotNull String doiNumber,
      * Challenges the doiNumber validity depending upon doiType.
      * The rules for doi number validity are set in SUNAT-PLE specifications
      * and are the following:
-     * <table cellspacing="0">
+     * <table style="border-spacing: 0px; border-collapse: collapse;">
+     *     <caption>
+     *         Doi Type PLE specs rules.
+     *     </caption>
      *     <tr >
      *         <td style="border-width:1px;border-style:solid;border-collapse:collapse;border-spacing:0px">Doi Type</td>
      *         <td style="border-width:1px;border-style:solid;border-collapse:collapse;border-spacing:0px">Description</td>

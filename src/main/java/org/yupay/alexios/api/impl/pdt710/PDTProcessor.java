@@ -20,8 +20,8 @@ package org.yupay.alexios.api.impl.pdt710;
 import com.google.api.services.sheets.v4.model.RowData;
 import com.google.api.services.sheets.v4.model.Sheet;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
-import org.yupay.alexios.api.BookProcessor;
 import org.jetbrains.annotations.NotNull;
+import org.yupay.alexios.api.BookProcessor;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -42,6 +42,12 @@ import static org.yupay.alexios.google.GoogleUtils.*;
  * @version 1.0
  */
 public final class PDTProcessor implements BookProcessor {
+
+    /**
+     * Creates an empty PDT processor object.
+     */
+    public PDTProcessor() {
+    }
 
     @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {

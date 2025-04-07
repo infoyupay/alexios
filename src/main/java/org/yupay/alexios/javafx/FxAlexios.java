@@ -20,13 +20,30 @@ package org.yupay.alexios.javafx;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+/**
+ * Application entry point class.
+ *
+ * @author InfoYupay SACS
+ * @version 1.0
+ */
 public class FxAlexios extends Application {
+    /**
+     * Creates a new Alexios JavaFX application instance.
+     */
+    public FxAlexios() {
+    }
+
+    /**
+     * Entry point to the app (main method).
+     *
+     * @param args the args from console.
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         var fxMain = FxMainScene.create();
         fxMain.addToStage(stage);
         stage.setTitle("Alexios");

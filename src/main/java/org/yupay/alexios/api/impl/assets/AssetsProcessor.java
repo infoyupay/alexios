@@ -19,9 +19,9 @@ package org.yupay.alexios.api.impl.assets;
 
 import com.google.api.services.sheets.v4.model.CellData;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
+import org.jetbrains.annotations.NotNull;
 import org.yupay.alexios.api.BookProcessor;
 import org.yupay.alexios.api.PLEBookNameBuilder;
-import org.jetbrains.annotations.NotNull;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -44,6 +44,12 @@ public class AssetsProcessor implements BookProcessor {
     private String year;
     private String period;
     private String opsFlag;
+
+    /**
+     * Creates an empty assets book processor.
+     */
+    public AssetsProcessor() {
+    }
 
     @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {

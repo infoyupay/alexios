@@ -70,6 +70,11 @@ public class PLEBookNameBuilder {
      * the extension itself.
      */
     private String extension = "TXT";
+    /**
+     * Craetes a new builder instance.
+     */
+    public PLEBookNameBuilder() {
+    }
 
     /**
      * Fluent setter - with.

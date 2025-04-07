@@ -96,7 +96,6 @@ public class GoogleUtils {
      * The default Json Factory, which is Gson.
      */
     public static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-
     /**
      * A scope to read spreadsheets with the following scopes:
      * <ol>
@@ -109,6 +108,16 @@ public class GoogleUtils {
     static {
         PLE_FMT.setParseBigDecimal(true);
         PLE_1602_7_FMT.setParseBigDecimal(true);
+    }
+
+    /**
+     * Hidden empty constructor to enforce utility class pattern.
+     *
+     * @throws IllegalAccessException always.
+     */
+    @Contract("->fail")
+    private GoogleUtils() throws IllegalAccessException {
+        throw new IllegalAccessException("Utility class shall not be instanciated.");
     }
 
     /**

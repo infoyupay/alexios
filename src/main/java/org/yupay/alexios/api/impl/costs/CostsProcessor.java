@@ -18,8 +18,8 @@
 package org.yupay.alexios.api.impl.costs;
 
 import com.google.api.services.sheets.v4.model.Spreadsheet;
-import org.yupay.alexios.api.BookProcessor;
 import org.jetbrains.annotations.NotNull;
+import org.yupay.alexios.api.BookProcessor;
 
 import java.nio.file.Path;
 
@@ -33,6 +33,12 @@ import static org.yupay.alexios.google.GoogleUtils.infoFlag;
  * @version 1.0
  */
 public class CostsProcessor implements BookProcessor {
+
+    /**
+     * Creates an empty costs book processor.
+     */
+    public CostsProcessor() {
+    }
 
     @Override
     public void processSheet(@NotNull Spreadsheet spreadsheet, Path target) throws Exception {

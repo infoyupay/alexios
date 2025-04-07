@@ -42,6 +42,12 @@ import static org.yupay.alexios.google.GoogleUtils.recreateFile;
  */
 public class BalanceProcessor implements BookProcessor {
 
+    /**
+     * Creates an empty balance sheet processor.
+     */
+    public BalanceProcessor() {
+    }
+
     @Override
     public void processSheet(Spreadsheet spreadsheet, Path target) throws Exception {
         //Extract parameters from first worksheet.

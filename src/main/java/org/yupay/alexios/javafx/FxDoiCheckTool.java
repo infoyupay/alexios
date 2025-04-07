@@ -48,6 +48,12 @@ public class FxDoiCheckTool extends Dialog<Object> {
     private TreeTableView<DoiMissmatch> ttbResults;
 
     /**
+     * Creates an empty controller instance.
+     */
+    public FxDoiCheckTool() {
+    }
+
+    /**
      * Static factory to create from FXML loader.
      *
      * @return the created controller.

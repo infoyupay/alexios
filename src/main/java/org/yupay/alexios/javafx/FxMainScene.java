@@ -57,18 +57,32 @@ import java.util.stream.Collectors;
  * @version 1.0
  */
 public class FxMainScene {
+
+    /*+++++++++++++++++++++++++++*
+     * FX Property declarations. *
+     *+++++++++++++++++++++++++++*/
     private final ReadOnlyObjectWrapper<GDriveFile> book0300File =
             new ReadOnlyObjectWrapper<>(this, "book0300File", GDriveFile.empty());
     private final ReadOnlyObjectWrapper<GDriveFile> book0700File =
             new ReadOnlyObjectWrapper<>(this, "book0700File", GDriveFile.empty());
     private final ReadOnlyObjectWrapper<GDriveFile> book1000File =
             new ReadOnlyObjectWrapper<>(this, "book1000File", GDriveFile.empty());
+    /*++++++++++++++++++*
+     * FXML components. *
+     *++++++++++++++++++*/
     @FXML
     private Scene top;
     @FXML
     private WebView webAbout;
+    @SuppressWarnings("unused")
     @FXML
     private TitledPane pnlAbout;
+
+    /**
+     * Creates an empty scene controller.
+     */
+    public FxMainScene() {
+    }
 
     /**
      * Static factory to load this controller from main_scene.fxml source.

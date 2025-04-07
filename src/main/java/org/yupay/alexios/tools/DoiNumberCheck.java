@@ -36,6 +36,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class DoiNumberCheck {
     /**
+     * Creates an empty DOI number check request.
+     */
+    public DoiNumberCheck() {
+
+    }
+
+    /**
      * Checks doi numbers from LE0300 draft stored in a google sheetName.
      *
      * @param spreadsheet the sheetName object.
